@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,11 +16,48 @@ import {
   Users, 
   DollarSign, 
   Target,
-  Calendar,
+  Loader2,
   FileText
 } from "lucide-react";
+import { useReportsData } from "@/hooks/useReportsData";
+import { InvestmentChart } from "@/components/reports/InvestmentChart";
+import { ChannelAnalysisChart } from "@/components/reports/ChannelAnalysisChart";
+import { ConversionFunnelChart } from "@/components/reports/ConversionFunnelChart";
+import { toast } from "@/components/ui/use-toast";
 
 const ReportsPage = () => {
+  const [timeRange, setTimeRange] = useState("30days");
+  const { data: reportsData, isLoading, error } = useReportsData(timeRange);
+
+  const handleExport = () => {
+    toast({
+      title: "Exportação iniciada",
+      description: "O relatório será gerado e enviado por email em breve.",
+    });
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value);
+  };
+
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <p className="text-red-600 mb-2">Erro ao carregar dados dos relatórios</p>
+            <p className="text-gray-500">{error.message}</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -29,7 +67,7 @@ const ReportsPage = () => {
             <p className="text-gray-600">Análises detalhadas de performance e captação</p>
           </div>
           <div className="flex space-x-2">
-            <Select defaultValue="30days">
+            <Select value={timeRange} onValueChange={setTimeRange}>
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
@@ -40,283 +78,167 @@ const ReportsPage = () => {
                 <SelectItem value="1year">Último ano</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleExport} className="bg-blue-600 hover:bg-blue-700">
               <Download className="w-4 h-4 mr-2" />
               Exportar
             </Button>
           </div>
         </div>
 
-        {/* Quick Reports */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Relatório de Captação</p>
-                  <p className="text-xs text-gray-500 mt-1">Performance mensal</p>
-                </div>
-                <div className="p-3 bg-green-100 rounded-full">
-                  <TrendingUp className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-              <Button variant="outline" className="w-full mt-4" size="sm">
-                <FileText className="w-4 h-4 mr-2" />
-                Gerar Relatório
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Relatório de Investidores</p>
-                  <p className="text-xs text-gray-500 mt-1">Análise de perfil</p>
-                </div>
-                <div className="p-3 bg-blue-100 rounded-full">
-                  <Users className="h-6 w-6 text-blue-600" />
-                </div>
-              </div>
-              <Button variant="outline" className="w-full mt-4" size="sm">
-                <FileText className="w-4 h-4 mr-2" />
-                Gerar Relatório
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Relatório de Parceiros</p>
-                  <p className="text-xs text-gray-500 mt-1">Performance e comissões</p>
-                </div>
-                <div className="p-3 bg-purple-100 rounded-full">
-                  <DollarSign className="h-6 w-6 text-purple-600" />
-                </div>
-              </div>
-              <Button variant="outline" className="w-full mt-4" size="sm">
-                <FileText className="w-4 h-4 mr-2" />
-                Gerar Relatório
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Relatório Financeiro</p>
-                  <p className="text-xs text-gray-500 mt-1">Fluxo de caixa</p>
-                </div>
-                <div className="p-3 bg-yellow-100 rounded-full">
-                  <Target className="h-6 w-6 text-yellow-600" />
-                </div>
-              </div>
-              <Button variant="outline" className="w-full mt-4" size="sm">
-                <FileText className="w-4 h-4 mr-2" />
-                Gerar Relatório
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Detailed Analytics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance de Captação</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-4 bg-green-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Janeiro 2024</p>
-                    <p className="text-sm text-gray-600">127 investidores</p>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-8 h-8 animate-spin mr-2" />
+            Carregando relatórios...
+          </div>
+        ) : reportsData ? (
+          <>
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Total Captado</p>
+                      <p className="text-2xl font-bold text-green-600">
+                        {formatCurrency(reportsData.investmentStats.totalCaptured)}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-green-100 rounded-full">
+                      <DollarSign className="h-6 w-6 text-green-600" />
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xl font-bold text-green-600">R$ 2.45M</p>
-                    <p className="text-sm text-green-600">↗ +12.5%</p>
-                  </div>
-                </div>
+                </CardContent>
+              </Card>
 
-                <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Dezembro 2023</p>
-                    <p className="text-sm text-gray-600">98 investidores</p>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Investimentos Ativos</p>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {reportsData.conversionFunnel.investors}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-blue-100 rounded-full">
+                      <Users className="h-6 w-6 text-blue-600" />
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xl font-bold text-blue-600">R$ 2.18M</p>
-                    <p className="text-sm text-blue-600">↗ +8.2%</p>
-                  </div>
-                </div>
+                </CardContent>
+              </Card>
 
-                <div className="flex justify-between items-center p-4 bg-purple-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Novembro 2023</p>
-                    <p className="text-sm text-gray-600">89 investidores</p>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Taxa de Conversão</p>
+                      <p className="text-2xl font-bold text-purple-600">
+                        {reportsData.conversionFunnel.leads > 0 ? 
+                          ((reportsData.conversionFunnel.investors / reportsData.conversionFunnel.leads) * 100).toFixed(1) : 0
+                        }%
+                      </p>
+                    </div>
+                    <div className="p-3 bg-purple-100 rounded-full">
+                      <Target className="h-6 w-6 text-purple-600" />
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xl font-bold text-purple-600">R$ 2.01M</p>
-                    <p className="text-sm text-purple-600">↗ +5.1%</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Análise por Canal</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
-                    <span>Site Direto</span>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Crescimento</p>
+                      <p className="text-2xl font-bold text-orange-600">
+                        {reportsData.monthlyInvestments.length > 1 ? 
+                          reportsData.monthlyInvestments[reportsData.monthlyInvestments.length - 1].growth.toFixed(1) : 0
+                        }%
+                      </p>
+                    </div>
+                    <div className="p-3 bg-orange-100 rounded-full">
+                      <TrendingUp className="h-6 w-6 text-orange-600" />
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold">45%</p>
-                    <p className="text-sm text-gray-500">R$ 1.1M</p>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-                    <span>Parceiros</span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold">35%</p>
-                    <p className="text-sm text-gray-500">R$ 857K</p>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
-                    <span>Indicações</span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold">15%</p>
-                    <p className="text-sm text-gray-500">R$ 367K</p>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
-                    <span>Marketing Digital</span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold">5%</p>
-                    <p className="text-sm text-gray-500">R$ 122K</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Conversion Funnel */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Funil de Conversão</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">1,250</div>
-                <div className="text-sm text-gray-600">Visitantes</div>
-                <div className="text-xs text-gray-500 mt-1">100%</div>
-              </div>
-
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">385</div>
-                <div className="text-sm text-gray-600">Leads</div>
-                <div className="text-xs text-gray-500 mt-1">30.8%</div>
-              </div>
-
-              <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                <div className="text-2xl font-bold text-yellow-600">198</div>
-                <div className="text-sm text-gray-600">Interessados</div>
-                <div className="text-xs text-gray-500 mt-1">51.4%</div>
-              </div>
-
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">156</div>
-                <div className="text-sm text-gray-600">Propostas</div>
-                <div className="text-xs text-gray-500 mt-1">78.8%</div>
-              </div>
-
-              <div className="text-center p-4 bg-red-50 rounded-lg">
-                <div className="text-2xl font-bold text-red-600">127</div>
-                <div className="text-sm text-gray-600">Investidores</div>
-                <div className="text-xs text-gray-500 mt-1">81.4%</div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Partner Performance */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Parceiros (Últimos 30 dias)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                    1
+            {/* Charts */}
+            <InvestmentChart data={reportsData.monthlyInvestments} />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ChannelAnalysisChart data={reportsData.channelAnalysis} />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Performance de Captação</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {reportsData.monthlyInvestments.slice(-3).map((month, index) => (
+                      <div key={month.month} className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg">
+                        <div>
+                          <p className="font-medium">{month.month}</p>
+                          <p className="text-sm text-gray-600">{month.investorCount} investidores</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xl font-bold text-green-600">
+                            {formatCurrency(month.totalAmount)}
+                          </p>
+                          <p className={`text-sm ${month.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {month.growth >= 0 ? '↗' : '↘'} {Math.abs(month.growth).toFixed(1)}%
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <p className="font-medium">Carlos Vendedor</p>
-                    <p className="text-sm text-gray-500">15 indicações</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">R$ 850K</p>
-                  <p className="text-sm text-gray-500">R$ 42.5K comissão</p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                    2
-                  </div>
-                  <div>
-                    <p className="font-medium">Ana Promotora</p>
-                    <p className="text-sm text-gray-500">8 indicações</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">R$ 450K</p>
-                  <p className="text-sm text-gray-500">R$ 22.5K comissão</p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                    3
-                  </div>
-                  <div>
-                    <p className="font-medium">Julia Santos</p>
-                    <p className="text-sm text-gray-500">5 indicações</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">R$ 200K</p>
-                  <p className="text-sm text-gray-500">R$ 10K comissão</p>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Conversion Funnel */}
+            <ConversionFunnelChart data={reportsData.conversionFunnel} />
+
+            {/* Top Partners */}
+            {reportsData.topPartners.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Top Parceiros (Período Selecionado)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {reportsData.topPartners.slice(0, 5).map((partner, index) => (
+                      <div key={partner.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-3 ${
+                            index === 0 ? 'bg-yellow-500' : 
+                            index === 1 ? 'bg-gray-400' : 
+                            index === 2 ? 'bg-orange-500' : 'bg-blue-500'
+                          }`}>
+                            {index + 1}
+                          </div>
+                          <div>
+                            <p className="font-medium">{partner.name}</p>
+                            <p className="text-sm text-gray-500">{partner.referrals} indicações</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold">{formatCurrency(partner.totalAmount)}</p>
+                          <p className="text-sm text-gray-500">{formatCurrency(partner.commission)} comissão</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-8">
+            <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+            <p className="text-gray-500">Nenhum dado disponível para o período selecionado</p>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );
