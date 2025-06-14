@@ -12,6 +12,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, userData?: any) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  testProfileCreation: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -66,6 +67,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Função para testar a criação de perfis
+  const testProfileCreation = async () => {
+    try {
+      console.log('Testing profile creation...');
+      const { data, error } = await supabase.rpc('test_profile_creation');
+      
+      if (error) {
+        console.error('Error testing profile creation:', error);
+        toast({
+          title: "Erro no teste",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        console.log('Profile creation test result:', data);
+        toast({
+          title: "Teste de perfis",
+          description: `Encontrados ${data?.[0]?.profiles_count || 0} perfis no banco`,
+        });
+      }
+    } catch (error: any) {
+      console.error('Exception in testProfileCreation:', error);
+      toast({
+        title: "Erro no teste",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     console.log('Setting up auth state listener...');
     
@@ -84,6 +115,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setTimeout(async () => {
             const profile = await fetchUserProfile(session.user.id);
             setUserProfile(profile);
+            
+            // Se o perfil não foi encontrado, pode ser que o trigger falhou
+            if (!profile) {
+              console.warn('Profile not found for user, trigger may have failed');
+              toast({
+                title: "Aviso",
+                description: "Perfil do usuário não foi criado automaticamente. Entre em contato com o suporte.",
+                variant: "destructive",
+              });
+            }
           }, 0);
         } else {
           setUserProfile(null);
@@ -119,6 +160,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string, userData?: any) => {
     try {
       console.log('Starting signup process for:', email);
+      setLoading(true);
       
       // Limpar estado antes do signup
       cleanupAuthState();
@@ -132,6 +174,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       const redirectUrl = `${window.location.origin}/`;
       
+      console.log('Calling supabase.auth.signUp with:', { email, userData });
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -141,17 +185,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       });
 
+      console.log('SignUp response:', { data, error });
+
       if (error) {
         console.error('Signup error:', error);
         toast({
           title: "Erro no cadastro",
-          description: error.message,
+          description: `${error.message} (Código: ${error.status})`,
           variant: "destructive",
         });
       } else {
         console.log('Signup successful:', data);
+        
+        // Verificar se o usuário foi criado
+        if (data?.user) {
+          console.log('User created with ID:', data.user.id);
+          
+          // Aguardar um pouco e verificar se o perfil foi criado
+          setTimeout(async () => {
+            const profile = await fetchUserProfile(data.user.id);
+            if (profile) {
+              console.log('Profile created successfully:', profile);
+              toast({
+                title: "Cadastro realizado!",
+                description: "Conta criada com sucesso. Verifique seu email se necessário.",
+              });
+            } else {
+              console.warn('Profile not created automatically');
+              toast({
+                title: "Cadastro parcialmente realizado",
+                description: "Usuário criado, mas perfil não foi configurado automaticamente.",
+                variant: "destructive",
+              });
+            }
+          }, 2000);
+        }
+        
         toast({
-          title: "Cadastro realizado!",
+          title: "Cadastro iniciado!",
           description: "Verifique seu email para confirmar a conta ou faça login se já confirmou.",
         });
       }
@@ -165,12 +236,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         variant: "destructive",
       });
       return { error };
+    } finally {
+      setLoading(false);
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
       console.log('Starting signin process for:', email);
+      setLoading(true);
       
       // Limpar estado antes do login
       cleanupAuthState();
@@ -191,7 +265,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error('Signin error:', error);
         toast({
           title: "Erro no login",
-          description: error.message,
+          description: `${error.message} (Código: ${error.status})`,
           variant: "destructive",
         });
       } else {
@@ -216,12 +290,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         variant: "destructive",
       });
       return { error };
+    } finally {
+      setLoading(false);
     }
   };
 
   const signOut = async () => {
     try {
       console.log('Starting signout process');
+      setLoading(true);
       
       // Limpar estado primeiro
       cleanupAuthState();
@@ -255,6 +332,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -266,6 +345,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signUp,
     signIn,
     signOut,
+    testProfileCreation,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

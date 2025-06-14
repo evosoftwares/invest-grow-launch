@@ -533,6 +533,14 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      test_profile_creation: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          profiles_count: number
+          latest_profile_id: string
+          latest_profile_email: string
+        }[]
+      }
     }
     Enums: {
       commission_status: "pending" | "calculated" | "paid" | "cancelled"
