@@ -3,17 +3,19 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Users, TrendingUp, Shield, Clock } from "lucide-react";
+import { ArrowRight, Users, TrendingUp, Shield, Clock, Calculator } from "lucide-react";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { FeaturesSection } from "@/components/FeaturesSection";
 import { InvestmentForm } from "@/components/InvestmentForm";
 import { PartnerRegistration } from "@/components/PartnerRegistration";
 import { Footer } from "@/components/Footer";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [showInvestmentForm, setShowInvestmentForm] = useState(false);
   const [showPartnerForm, setShowPartnerForm] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleOpenInvestmentForm = () => {
@@ -41,6 +43,32 @@ const Index = () => {
         onInvestClick={() => setShowInvestmentForm(true)}
         onPartnerClick={() => setShowPartnerForm(true)}
       />
+      
+      {/* ROI Calculator Section */}
+      <section className="py-16 px-4 bg-gradient-to-r from-purple-50 to-blue-50">
+        <div className="max-w-6xl mx-auto text-center">
+          <Badge className="mb-4 bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600">
+            Nova Ferramenta
+          </Badge>
+          <h2 className="text-4xl font-bold text-slate-900 mb-6">
+            Calcule seu Retorno de Investimento
+          </h2>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-8">
+            Use nossa calculadora avanç da para simular diferentes cenários de investimento 
+            e visualizar o potencial de crescimento do seu dinheiro.
+          </p>
+          
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 text-lg"
+            onClick={() => navigate('/calculadora')}
+          >
+            <Calculator className="mr-2 w-5 h-5" />
+            Usar Calculadora ROI
+            <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
+        </div>
+      </section>
       
       <FeaturesSection />
       
