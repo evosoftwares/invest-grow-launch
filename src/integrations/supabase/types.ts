@@ -49,15 +49,7 @@ export type Database = {
           user_agent?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "activities_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       commissions: {
         Row: {
@@ -71,7 +63,6 @@ export type Database = {
           partner_id: string
           payment_reference: string | null
           rate: number
-          status: Database["public"]["Enums"]["commission_status"] | null
         }
         Insert: {
           amount: number
@@ -84,7 +75,6 @@ export type Database = {
           partner_id: string
           payment_reference?: string | null
           rate: number
-          status?: Database["public"]["Enums"]["commission_status"] | null
         }
         Update: {
           amount?: number
@@ -97,7 +87,6 @@ export type Database = {
           partner_id?: string
           payment_reference?: string | null
           rate?: number
-          status?: Database["public"]["Enums"]["commission_status"] | null
         }
         Relationships: [
           {
@@ -164,13 +153,6 @@ export type Database = {
             referencedRelation: "investors"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "communications_sent_by_fkey"
-            columns: ["sent_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       investments: {
@@ -188,7 +170,6 @@ export type Database = {
           paid_at: string | null
           partner_id: string | null
           payment_proof_url: string | null
-          status: Database["public"]["Enums"]["investment_status"] | null
           updated_at: string | null
         }
         Insert: {
@@ -205,7 +186,6 @@ export type Database = {
           paid_at?: string | null
           partner_id?: string | null
           payment_proof_url?: string | null
-          status?: Database["public"]["Enums"]["investment_status"] | null
           updated_at?: string | null
         }
         Update: {
@@ -222,17 +202,9 @@ export type Database = {
           paid_at?: string | null
           partner_id?: string | null
           payment_proof_url?: string | null
-          status?: Database["public"]["Enums"]["investment_status"] | null
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "investments_approved_by_fkey"
-            columns: ["approved_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "investments_investor_id_fkey"
             columns: ["investor_id"]
@@ -261,13 +233,11 @@ export type Database = {
           income_range: string | null
           investment_experience: string | null
           last_contact_date: string | null
-          lead_source: Database["public"]["Enums"]["lead_source"] | null
           notes: string | null
           partner_id: string | null
           phone: string | null
           profession: string | null
           profile_id: string | null
-          status: Database["public"]["Enums"]["investor_status"] | null
           tags: string[] | null
           updated_at: string | null
         }
@@ -282,13 +252,11 @@ export type Database = {
           income_range?: string | null
           investment_experience?: string | null
           last_contact_date?: string | null
-          lead_source?: Database["public"]["Enums"]["lead_source"] | null
           notes?: string | null
           partner_id?: string | null
           phone?: string | null
           profession?: string | null
           profile_id?: string | null
-          status?: Database["public"]["Enums"]["investor_status"] | null
           tags?: string[] | null
           updated_at?: string | null
         }
@@ -303,32 +271,15 @@ export type Database = {
           income_range?: string | null
           investment_experience?: string | null
           last_contact_date?: string | null
-          lead_source?: Database["public"]["Enums"]["lead_source"] | null
           notes?: string | null
           partner_id?: string | null
           phone?: string | null
           profession?: string | null
           profile_id?: string | null
-          status?: Database["public"]["Enums"]["investor_status"] | null
           tags?: string[] | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "investors_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "investors_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       partner_links: {
         Row: {
@@ -396,7 +347,6 @@ export type Database = {
           id: string
           profile_id: string
           specialty: string | null
-          status: Database["public"]["Enums"]["partner_status"] | null
           updated_at: string | null
         }
         Insert: {
@@ -411,7 +361,6 @@ export type Database = {
           id?: string
           profile_id: string
           specialty?: string | null
-          status?: Database["public"]["Enums"]["partner_status"] | null
           updated_at?: string | null
         }
         Update: {
@@ -426,25 +375,9 @@ export type Database = {
           id?: string
           profile_id?: string
           specialty?: string | null
-          status?: Database["public"]["Enums"]["partner_status"] | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "partners_approved_by_fkey"
-            columns: ["approved_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "partners_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -507,28 +440,13 @@ export type Database = {
           updated_by?: string | null
           value?: Json
         }
-        Relationships: [
-          {
-            foreignKeyName: "system_settings_updated_by_fkey"
-            columns: ["updated_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _user_id: string
-          _role: Database["public"]["Enums"]["user_role"]
-        }
-        Returns: boolean
-      }
       is_admin: {
         Args: { _user_id: string }
         Returns: boolean
