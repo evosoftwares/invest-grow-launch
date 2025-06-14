@@ -1,177 +1,228 @@
 
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Users, 
-  DollarSign, 
-  TrendingUp, 
-  UserPlus,
-  ArrowUpRight,
-  ArrowDownRight
-} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { AdminLayout } from "@/components/admin/AdminLayout";
+import { Users, UserCheck, TrendingUp, DollarSign, Target, BarChart3 } from "lucide-react";
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { useInvestments } from "@/hooks/useInvestments";
+import { usePartners } from "@/hooks/usePartners";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AdminDashboard = () => {
-  // Mock data - em produção viria de uma API
-  const stats = {
-    totalInvestors: 127,
-    totalCaptured: 2450000,
-    activePartners: 23,
-    conversionRate: 15.8,
-    monthlyGrowth: 12.5,
-    pendingInvestments: 8
+  const { data: dashboardStats, isLoading: statsLoading } = useDashboardData();
+  const { data: investments, isLoading: investmentsLoading } = useInvestments();
+  const { data: partners, isLoading: partnersLoading } = usePartners();
+
+  // Formatador de moeda
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
   };
 
-  const recentInvestors = [
-    { name: "João Silva", amount: 50000, status: "Confirmado", date: "2024-01-15" },
-    { name: "Maria Santos", amount: 100000, status: "Pendente", date: "2024-01-14" },
-    { name: "Carlos Oliveira", amount: 25000, status: "Confirmado", date: "2024-01-13" },
-    { name: "Ana Costa", amount: 75000, status: "Análise", date: "2024-01-12" },
-  ];
+  const formatPercentage = (value: number) => {
+    return `${value.toFixed(1)}%`;
+  };
+
+  if (statsLoading) {
+    return (
+      <AdminLayout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Visão geral do sistema de captação de investimentos
+            </p>
+          </div>
+          
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-32" />
+            ))}
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  const progressPercentage = dashboardStats 
+    ? (dashboardStats.totalAmount / dashboardStats.investmentGoal) * 100 
+    : 0;
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
+      <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Visão geral das captações e investimentos</p>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Visão geral do sistema de captação de investimentos
+          </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Cards de estatísticas principais */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Investidores</CardTitle>
+              <CardTitle className="text-sm font-medium">Total de Investidores</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalInvestors}</div>
-              <div className="flex items-center text-xs text-green-600">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                +12% vs mês anterior
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Captado</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                R$ {(stats.totalCaptured / 1000000).toFixed(1)}M
-              </div>
-              <div className="flex items-center text-xs text-green-600">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                +{stats.monthlyGrowth}% este mês
-              </div>
+              <div className="text-2xl font-bold">{dashboardStats?.totalInvestors || 0}</div>
+              <p className="text-xs text-muted-foreground">
+                Leads registrados no sistema
+              </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Parceiros Ativos</CardTitle>
-              <UserPlus className="h-4 w-4 text-muted-foreground" />
+              <UserCheck className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.activePartners}</div>
-              <div className="flex items-center text-xs text-green-600">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                +3 novos este mês
-              </div>
+              <div className="text-2xl font-bold">{dashboardStats?.activePartners || 0}</div>
+              <p className="text-xs text-muted-foreground">
+                de {dashboardStats?.totalPartners || 0} parceiros cadastrados
+              </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Taxa Conversão</CardTitle>
+              <CardTitle className="text-sm font-medium">Valor Captado</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {formatCurrency(dashboardStats?.totalAmount || 0)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Investimentos confirmados
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Taxa de Conversão</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.conversionRate}%</div>
-              <div className="flex items-center text-xs text-red-600">
-                <ArrowDownRight className="h-3 w-3 mr-1" />
-                -2.1% vs mês anterior
+              <div className="text-2xl font-bold">
+                {formatPercentage(dashboardStats?.conversionRate || 0)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Leads convertidos em investidores
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Cards de progresso e status */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Progresso da Captação
+              </CardTitle>
+              <CardDescription>
+                Meta: {formatCurrency(dashboardStats?.investmentGoal || 0)}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span>Captado</span>
+                  <span>{formatCurrency(dashboardStats?.totalAmount || 0)}</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div 
+                    className="bg-blue-600 h-3 rounded-full transition-all duration-300" 
+                    style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>0%</span>
+                  <span className="font-medium">{formatPercentage(progressPercentage)}</span>
+                  <span>100%</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Status dos Investimentos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Pendentes</span>
+                  <Badge variant="outline">
+                    {dashboardStats?.pendingInvestments || 0}
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Total</span>
+                  <Badge variant="secondary">
+                    {dashboardStats?.totalInvestments || 0}
+                  </Badge>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Investimentos Recentes</CardTitle>
-              <CardDescription>Últimos investimentos registrados</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentInvestors.map((investor, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+        {/* Lista de investimentos recentes */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Investimentos Recentes</CardTitle>
+            <CardDescription>
+              Últimos investimentos registrados no sistema
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {investmentsLoading ? (
+              <div className="space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton key={i} className="h-12 w-full" />
+                ))}
+              </div>
+            ) : investments && investments.length > 0 ? (
+              <div className="space-y-3">
+                {investments.slice(0, 5).map((investment) => (
+                  <div key={investment.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
-                      <p className="font-medium">{investor.name}</p>
-                      <p className="text-sm text-gray-500">{investor.date}</p>
+                      <p className="font-medium">{investment.investors?.full_name}</p>
+                      <p className="text-sm text-muted-foreground">{investment.investors?.email}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">
-                        R$ {investor.amount.toLocaleString('pt-BR')}
-                      </p>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        investor.status === 'Confirmado' 
-                          ? 'bg-green-100 text-green-800'
-                          : investor.status === 'Pendente'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
-                        {investor.status}
-                      </span>
+                      <p className="font-medium">{formatCurrency(investment.amount)}</p>
+                      <Badge 
+                        variant={
+                          investment.status === 'paid' ? 'default' : 
+                          investment.status === 'approved' ? 'secondary' : 
+                          'outline'
+                        }
+                      >
+                        {investment.status}
+                      </Badge>
                     </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Ações Pendentes</CardTitle>
-              <CardDescription>Itens que precisam da sua atenção</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <div>
-                    <p className="font-medium">Investimentos Pendentes</p>
-                    <p className="text-sm text-gray-600">Aguardando confirmação</p>
-                  </div>
-                  <div className="text-2xl font-bold text-yellow-600">
-                    {stats.pendingInvestments}
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div>
-                    <p className="font-medium">Novos Parceiros</p>
-                    <p className="text-sm text-gray-600">Aguardando aprovação</p>
-                  </div>
-                  <div className="text-2xl font-bold text-blue-600">
-                    5
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <div>
-                    <p className="font-medium">Meta Mensal</p>
-                    <p className="text-sm text-gray-600">78% atingido</p>
-                  </div>
-                  <div className="text-2xl font-bold text-green-600">
-                    78%
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">
+                Nenhum investimento encontrado
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );

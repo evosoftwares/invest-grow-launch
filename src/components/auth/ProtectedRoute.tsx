@@ -9,7 +9,14 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
-  const { user, loading } = useAuth();
+  const { user, loading, userProfile } = useAuth();
+
+  console.log('ProtectedRoute check:', { 
+    user: user?.email, 
+    loading, 
+    userProfile: userProfile?.role,
+    requiredRole 
+  });
 
   if (loading) {
     return (
@@ -20,13 +27,16 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   }
 
   if (!user) {
+    console.log('No user, redirecting to auth');
     return <Navigate to="/auth" replace />;
   }
 
-  if (requiredRole) {
-    const userRole = user.user_metadata?.role || 'investor';
+  if (requiredRole && userProfile) {
+    const userRole = userProfile.role || 'investor';
+    console.log('Role check:', { userRole, requiredRole });
+    
     if (userRole !== requiredRole && userRole !== 'admin') {
-      // Admins can access any route
+      console.log('Insufficient permissions, redirecting to home');
       return <Navigate to="/" replace />;
     }
   }
