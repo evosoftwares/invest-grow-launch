@@ -6,6 +6,20 @@ import { useState } from "react";
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setIsMenuOpen(false); // Fecha o menu mobile após clicar
+    }
+  };
+
+  const handleInvestClick = () => {
+    const investEvent = new CustomEvent('openInvestmentForm');
+    window.dispatchEvent(investEvent);
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,22 +28,33 @@ export const Header = () => {
             <img 
               src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
               alt="Futuro PDV" 
-              className="h-10 w-auto"
+              className="h-10 w-auto cursor-pointer"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             />
           </div>
           
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#sobre" className="text-slate-700 hover:text-blue-600 transition-colors">
+            <button 
+              onClick={() => scrollToSection('sobre')}
+              className="text-slate-700 hover:text-blue-600 transition-colors"
+            >
               Sobre
-            </a>
-            <a href="#oportunidade" className="text-slate-700 hover:text-blue-600 transition-colors">
+            </button>
+            <button 
+              onClick={() => scrollToSection('oportunidade')}
+              className="text-slate-700 hover:text-blue-600 transition-colors"
+            >
               Oportunidade
-            </a>
-            <a href="#parceiros" className="text-slate-700 hover:text-blue-600 transition-colors">
+            </button>
+            <button 
+              onClick={() => scrollToSection('parceiros')}
+              className="text-slate-700 hover:text-blue-600 transition-colors"
+            >
               Seja um Parceiro
-            </a>
+            </button>
             <Button 
               className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+              onClick={handleInvestClick}
             >
               Investir Agora
             </Button>
@@ -46,17 +71,27 @@ export const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-slate-200">
             <nav className="flex flex-col space-y-4">
-              <a href="#sobre" className="text-slate-700 hover:text-blue-600 transition-colors">
+              <button 
+                onClick={() => scrollToSection('sobre')}
+                className="text-slate-700 hover:text-blue-600 transition-colors text-left"
+              >
                 Sobre
-              </a>
-              <a href="#oportunidade" className="text-slate-700 hover:text-blue-600 transition-colors">
+              </button>
+              <button 
+                onClick={() => scrollToSection('oportunidade')}
+                className="text-slate-700 hover:text-blue-600 transition-colors text-left"
+              >
                 Oportunidade
-              </a>
-              <a href="#parceiros" className="text-slate-700 hover:text-blue-600 transition-colors">
+              </button>
+              <button 
+                onClick={() => scrollToSection('parceiros')}
+                className="text-slate-700 hover:text-blue-600 transition-colors text-left"
+              >
                 Seja um Parceiro
-              </a>
+              </button>
               <Button 
                 className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white w-full"
+                onClick={handleInvestClick}
               >
                 Investir Agora
               </Button>

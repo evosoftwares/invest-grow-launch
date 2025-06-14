@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,24 @@ const Index = () => {
   const [showInvestmentForm, setShowInvestmentForm] = useState(false);
   const [showPartnerForm, setShowPartnerForm] = useState(false);
 
+  useEffect(() => {
+    const handleOpenInvestmentForm = () => {
+      setShowInvestmentForm(true);
+    };
+
+    const handleOpenPartnerForm = () => {
+      setShowPartnerForm(true);
+    };
+
+    window.addEventListener('openInvestmentForm', handleOpenInvestmentForm);
+    window.addEventListener('openPartnerForm', handleOpenPartnerForm);
+
+    return () => {
+      window.removeEventListener('openInvestmentForm', handleOpenInvestmentForm);
+      window.removeEventListener('openPartnerForm', handleOpenPartnerForm);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Header />
@@ -27,7 +45,7 @@ const Index = () => {
       <FeaturesSection />
       
       {/* Investment Opportunity Section */}
-      <section className="py-20 px-4">
+      <section id="oportunidade" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-[#B8FAFF] text-slate-800 hover:bg-[#9BEAFF]">
@@ -87,6 +105,80 @@ const Index = () => {
               onClick={() => setShowInvestmentForm(true)}
             >
               Investir Agora
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Partner Section */}
+      <section id="parceiros" className="py-20 px-4 bg-slate-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-[#B8FAFF] text-slate-800 hover:bg-[#9BEAFF]">
+              Programa de Parceiros
+            </Badge>
+            <h2 className="text-4xl font-bold text-slate-900 mb-6">
+              Seja um Parceiro de Captação
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              Ganhe comissões atrativas indicando investidores para nossa plataforma. 
+              Sistema automático de tracking e pagamentos.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <Card className="border-2 border-[#B8FAFF] hover:shadow-xl transition-all duration-300">
+              <CardHeader>
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl mb-4">
+                  5%
+                </div>
+                <CardTitle className="text-slate-900">Comissão Inicial</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-slate-600">
+                  5% sobre o primeiro investimento de cada pessoa que você indicar.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-[#B8FAFF] hover:shadow-xl transition-all duration-300">
+              <CardHeader>
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg mb-4">
+                  2,5%
+                </div>
+                <CardTitle className="text-slate-900">Novos Aportes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-slate-600">
+                  2,5% a 3% sobre investimentos futuros dos seus indicados.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-[#B8FAFF] hover:shadow-xl transition-all duration-300">
+              <CardHeader>
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg mb-4">
+                  2%
+                </div>
+                <CardTitle className="text-slate-900">Comissão Recorrente</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-slate-600">
+                  1,5% a 2% mensalmente sobre o saldo investido dos seus indicados.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center">
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 text-lg"
+              onClick={() => setShowPartnerForm(true)}
+            >
+              <Users className="mr-2 w-5 h-5" />
+              Quero ser Parceiro
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>
