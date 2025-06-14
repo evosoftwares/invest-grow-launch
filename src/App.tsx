@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ROICalculatorPage from "./pages/ROICalculatorPage";
@@ -16,32 +17,93 @@ import PartnerDashboard from "./pages/partner/PartnerDashboard";
 import PartnerLinks from "./pages/partner/PartnerLinks";
 import PartnerCommissions from "./pages/partner/PartnerCommissions";
 import AdminLogin from "./pages/admin/AdminLogin";
+import AuthPage from "./components/auth/AuthPage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/calculadora" element={<ROICalculatorPage />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/investors" element={<InvestorsManagement />} />
-          <Route path="/admin/partners" element={<PartnersManagement />} />
-          <Route path="/admin/financial" element={<FinancialManagement />} />
-          <Route path="/admin/reports" element={<ReportsPage />} />
-          <Route path="/partner/dashboard" element={<PartnerDashboard />} />
-          <Route path="/partner/links" element={<PartnerLinks />} />
-          <Route path="/partner/commissions" element={<PartnerCommissions />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/calculadora" element={<ROICalculatorPage />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route 
+              path="/admin/dashboard" 
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/investors" 
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <InvestorsManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/partners" 
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <PartnersManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/financial" 
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <FinancialManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/reports" 
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <ReportsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/partner/dashboard" 
+              element={
+                <ProtectedRoute requiredRole="partner">
+                  <PartnerDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/partner/links" 
+              element={
+                <ProtectedRoute requiredRole="partner">
+                  <PartnerLinks />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/partner/commissions" 
+              element={
+                <ProtectedRoute requiredRole="partner">
+                  <PartnerCommissions />
+                </ProtectedRoute>
+              } 
+            />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

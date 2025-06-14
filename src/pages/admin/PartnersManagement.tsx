@@ -20,67 +20,15 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Search, UserPlus, Eye, Mail, DollarSign, TrendingUp } from "lucide-react";
+import { Search, UserPlus, Eye, Mail, DollarSign, TrendingUp, Check, X } from "lucide-react";
+import { usePartners, usePartnerMutations } from "@/hooks/usePartners";
 
 const PartnersManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-
-  // Mock data - em produção viria de uma API
-  const partners = [
-    {
-      id: 1,
-      name: "Carlos Vendedor",
-      email: "carlos@vendedor.com",
-      phone: "(11) 99999-0001",
-      status: "active",
-      totalIndicacoes: 15,
-      totalCaptado: 850000,
-      comissaoTotal: 42500,
-      comissaoPendente: 5000,
-      registroDate: "2023-12-01",
-      ultimaIndicacao: "2024-01-14"
-    },
-    {
-      id: 2,
-      name: "Ana Promotora",
-      email: "ana@promotora.com",
-      phone: "(11) 99999-0002",
-      status: "active",
-      totalIndicacoes: 8,
-      totalCaptado: 450000,
-      comissaoTotal: 22500,
-      comissaoPendente: 2500,
-      registroDate: "2024-01-05",
-      ultimaIndicacao: "2024-01-13"
-    },
-    {
-      id: 3,
-      name: "Pedro Silva",
-      email: "pedro@silva.com",
-      phone: "(11) 99999-0003",
-      status: "pending",
-      totalIndicacoes: 2,
-      totalCaptado: 75000,
-      comissaoTotal: 0,
-      comissaoPendente: 3750,
-      registroDate: "2024-01-10",
-      ultimaIndicacao: "2024-01-12"
-    },
-    {
-      id: 4,
-      name: "Julia Santos",
-      email: "julia@santos.com",
-      phone: "(11) 99999-0004",
-      status: "inactive",
-      totalIndicacoes: 5,
-      totalCaptado: 200000,
-      comissaoTotal: 10000,
-      comissaoPendente: 0,
-      registroDate: "2023-11-15",
-      ultimaIndicacao: "2023-12-20"
-    }
-  ];
+  
+  const { data: partners = [], isLoading } = usePartners();
+  const { updatePartnerStatus } = usePartnerMutations();
 
   const getStatusBadge = (status: string) => {
     const statusMap = {
@@ -94,9 +42,16 @@ const PartnersManagement = () => {
     return <Badge className={statusInfo.color}>{statusInfo.label}</Badge>;
   };
 
+  const handleStatusChange = (partnerId: string, newStatus: string) => {
+    updatePartnerStatus.mutate({ id: partnerId, status: newStatus });
+  };
+
   const filteredPartners = partners.filter(partner => {
-    const matchesSearch = partner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         partner.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const partnerName = partner.profiles?.full_name || partner.business_name || '';
+    const partnerEmail = partner.profiles?.email || '';
+    
+    const matchesSearch = partnerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         partnerEmail.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "all" || partner.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -104,9 +59,21 @@ const PartnersManagement = () => {
   const totalStats = {
     totalPartners: partners.length,
     activePartners: partners.filter(p => p.status === 'active').length,
-    totalCaptado: partners.reduce((sum, p) => sum + p.totalCaptado, 0),
-    totalComissoes: partners.reduce((sum, p) => sum + p.comissaoTotal, 0)
+    pendingPartners: partners.filter(p => p.status === 'pending').length,
+    avgCommissionRate: partners.length > 0 
+      ? partners.reduce((sum, p) => sum + Number(p.commission_rate), 0) / partners.length 
+      : 0
   };
+
+  if (isLoading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -152,12 +119,10 @@ const PartnersManagement = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold">
-                    R$ {(totalStats.totalCaptado / 1000000).toFixed(1)}M
-                  </div>
-                  <div className="text-sm text-gray-600">Total Captado</div>
+                  <div className="text-2xl font-bold text-yellow-600">{totalStats.pendingPartners}</div>
+                  <div className="text-sm text-gray-600">Pendentes</div>
                 </div>
-                <DollarSign className="h-8 w-8 text-blue-500" />
+                <DollarSign className="h-8 w-8 text-yellow-500" />
               </div>
             </CardContent>
           </Card>
@@ -167,11 +132,11 @@ const PartnersManagement = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-2xl font-bold">
-                    R$ {(totalStats.totalComissoes / 1000).toFixed(0)}K
+                    {totalStats.avgCommissionRate.toFixed(1)}%
                   </div>
-                  <div className="text-sm text-gray-600">Comissões Pagas</div>
+                  <div className="text-sm text-gray-600">Comissão Média</div>
                 </div>
-                <DollarSign className="h-8 w-8 text-green-500" />
+                <DollarSign className="h-8 w-8 text-blue-500" />
               </div>
             </CardContent>
           </Card>
@@ -223,11 +188,9 @@ const PartnersManagement = () => {
                   <TableRow>
                     <TableHead>Parceiro</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Indicações</TableHead>
-                    <TableHead>Total Captado</TableHead>
-                    <TableHead>Comissão Paga</TableHead>
-                    <TableHead>Pendente</TableHead>
-                    <TableHead>Última Indicação</TableHead>
+                    <TableHead>Taxa Comissão</TableHead>
+                    <TableHead>Especialidade</TableHead>
+                    <TableHead>Data Cadastro</TableHead>
                     <TableHead>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -236,26 +199,47 @@ const PartnersManagement = () => {
                     <TableRow key={partner.id}>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{partner.name}</div>
-                          <div className="text-sm text-gray-500">{partner.email}</div>
+                          <div className="font-medium">
+                            {partner.profiles?.full_name || partner.business_name || 'Nome não informado'}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {partner.profiles?.email || 'Email não informado'}
+                          </div>
+                          {partner.profiles?.phone && (
+                            <div className="text-sm text-gray-500">{partner.profiles.phone}</div>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>{getStatusBadge(partner.status)}</TableCell>
-                      <TableCell className="text-center font-medium">
-                        {partner.totalIndicacoes}
+                      <TableCell className="font-medium">
+                        {Number(partner.commission_rate).toFixed(1)}%
                       </TableCell>
-                      <TableCell className="font-semibold">
-                        R$ {partner.totalCaptado.toLocaleString('pt-BR')}
+                      <TableCell>{partner.specialty || '-'}</TableCell>
+                      <TableCell>
+                        {new Date(partner.created_at).toLocaleDateString('pt-BR')}
                       </TableCell>
-                      <TableCell className="font-semibold text-green-600">
-                        R$ {partner.comissaoTotal.toLocaleString('pt-BR')}
-                      </TableCell>
-                      <TableCell className="font-semibold text-yellow-600">
-                        R$ {partner.comissaoPendente.toLocaleString('pt-BR')}
-                      </TableCell>
-                      <TableCell>{partner.ultimaIndicacao}</TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
+                          {partner.status === 'pending' && (
+                            <>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleStatusChange(partner.id, 'active')}
+                                disabled={updatePartnerStatus.isPending}
+                              >
+                                <Check className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleStatusChange(partner.id, 'blocked')}
+                                disabled={updatePartnerStatus.isPending}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </>
+                          )}
                           <Button variant="outline" size="sm">
                             <Eye className="w-4 h-4" />
                           </Button>

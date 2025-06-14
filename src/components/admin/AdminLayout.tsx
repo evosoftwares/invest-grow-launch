@@ -12,6 +12,7 @@ import {
   Menu,
   X
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -21,6 +22,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   const navigation = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
@@ -30,8 +32,9 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: 'Relatórios', href: '/admin/reports', icon: BarChart3 },
   ];
 
-  const handleLogout = () => {
-    navigate('/admin/login');
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
   };
 
   return (
