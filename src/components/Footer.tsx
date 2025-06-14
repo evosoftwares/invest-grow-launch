@@ -1,4 +1,3 @@
-
 import { Mail, Phone, MapPin } from "lucide-react";
 
 export const Footer = () => {
@@ -8,7 +7,7 @@ export const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
           <div className="col-span-2">
             <img 
-              src="/lovable-uploads/45633279-9a0a-411d-a264-6a2d43c99e91.png" 
+              src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
               alt="Futuro PDV" 
               className="h-12 w-auto mb-6 filter brightness-0 invert"
             />
