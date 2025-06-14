@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -42,7 +41,7 @@ const PartnersManagement = () => {
     return <Badge className={statusInfo.color}>{statusInfo.label}</Badge>;
   };
 
-  const handleStatusChange = (partnerId: string, newStatus: string) => {
+  const handleStatusChange = (partnerId: string, newStatus: 'pending' | 'active' | 'inactive' | 'blocked') => {
     updatePartnerStatus.mutate({ id: partnerId, status: newStatus });
   };
 
