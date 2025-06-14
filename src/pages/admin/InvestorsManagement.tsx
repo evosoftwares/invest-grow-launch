@@ -252,7 +252,7 @@ const InvestorsManagement = () => {
                       <TableCell>{getStatusBadge(investment.status)}</TableCell>
                       <TableCell>{formatDate(investment.created_at)}</TableCell>
                       <TableCell>
-                        {investment.partners?.profile_id ? 'Sim' : 'Direto'}
+                        {investment.partners ? 'Sim' : 'Direto'}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
