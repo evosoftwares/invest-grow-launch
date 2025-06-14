@@ -48,10 +48,14 @@ export const useInvestorMutations = () => {
   const queryClient = useQueryClient();
 
   const createInvestor = useMutation({
-    mutationFn: async (investorData: Partial<Investor>) => {
+    mutationFn: async (investorData: Omit<Investor, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from('investors')
-        .insert([investorData])
+        .insert([{
+          ...investorData,
+          full_name: investorData.full_name || '',
+          email: investorData.email || ''
+        }])
         .select()
         .single();
 
@@ -62,7 +66,7 @@ export const useInvestorMutations = () => {
       queryClient.invalidateQueries({ queryKey: ['investors'] });
       toast({
         title: "Investidor criado",
-        description: "Novo investidor foi criado com sucesso.",
+        description: "Investidor foi criado com sucesso.",
       });
     },
     onError: (error: any) => {
@@ -75,7 +79,7 @@ export const useInvestorMutations = () => {
   });
 
   const updateInvestorStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status }: { id: string; status: 'lead' | 'contacted' | 'proposal_sent' | 'negotiation' | 'analysis' | 'invested' | 'lost' }) => {
       const { data, error } = await supabase
         .from('investors')
         .update({ status })

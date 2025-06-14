@@ -21,7 +21,7 @@ export interface Partner {
     full_name: string | null;
     email: string;
     phone: string | null;
-  };
+  } | null;
 }
 
 export const usePartners = () => {
@@ -45,7 +45,10 @@ export const usePartners = () => {
         throw error;
       }
 
-      return data as Partner[];
+      return data?.map(partner => ({
+        ...partner,
+        profiles: partner.profiles && !Array.isArray(partner.profiles) ? partner.profiles : null
+      })) as Partner[];
     },
   });
 };
@@ -54,7 +57,7 @@ export const usePartnerMutations = () => {
   const queryClient = useQueryClient();
 
   const updatePartnerStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status }: { id: string; status: 'pending' | 'active' | 'inactive' | 'blocked' }) => {
       const { data, error } = await supabase
         .from('partners')
         .update({ 
