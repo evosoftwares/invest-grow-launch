@@ -77,13 +77,31 @@ export const useInvestmentMutations = () => {
       id: string; 
       status: 'pending' | 'analysis' | 'approved' | 'rejected' | 'paid' 
     }) => {
+      const updateData: any = { 
+        status,
+        updated_at: new Date().toISOString()
+      };
+
+      // Set timestamps based on status
+      if (status === 'approved') {
+        updateData.approved_at = new Date().toISOString();
+      } else if (status === 'paid') {
+        updateData.paid_at = new Date().toISOString();
+        // If setting to paid, also set approved_at if not already set
+        const { data: currentData } = await supabase
+          .from('investments')
+          .select('approved_at')
+          .eq('id', id)
+          .single();
+        
+        if (!currentData?.approved_at) {
+          updateData.approved_at = new Date().toISOString();
+        }
+      }
+
       const { data, error } = await supabase
         .from('investments')
-        .update({ 
-          status,
-          approved_at: status === 'approved' ? new Date().toISOString() : null,
-          paid_at: status === 'paid' ? new Date().toISOString() : null
-        })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
@@ -93,12 +111,14 @@ export const useInvestmentMutations = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['investments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-data'] });
       toast({
         title: "Status atualizado",
         description: "Status do investimento foi atualizado com sucesso.",
       });
     },
     onError: (error: any) => {
+      console.error('Error updating investment status:', error);
       toast({
         title: "Erro ao atualizar status",
         description: error.message,
@@ -107,7 +127,37 @@ export const useInvestmentMutations = () => {
     },
   });
 
+  const createInvestment = useMutation({
+    mutationFn: async (investmentData: Omit<Investment, 'id' | 'created_at' | 'updated_at'>) => {
+      const { data, error } = await supabase
+        .from('investments')
+        .insert([investmentData])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['investments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-data'] });
+      toast({
+        title: "Investimento criado",
+        description: "Investimento foi criado com sucesso.",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error creating investment:', error);
+      toast({
+        title: "Erro ao criar investimento",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     updateInvestmentStatus,
+    createInvestment,
   };
 };
