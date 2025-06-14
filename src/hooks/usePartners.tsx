@@ -32,7 +32,7 @@ export const usePartners = () => {
         .from('partners')
         .select(`
           *,
-          profiles (
+          profiles!partners_profile_id_fkey (
             full_name,
             email,
             phone
