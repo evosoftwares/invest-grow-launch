@@ -17,27 +17,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Função para limpeza completa do estado de autenticação
-const cleanupAuthState = () => {
-  console.log('Cleaning up auth state...');
-  
-  // Remove todas as chaves relacionadas ao Supabase
-  Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-      localStorage.removeItem(key);
-    }
-  });
-  
-  // Remove do sessionStorage também se existir
-  if (typeof sessionStorage !== 'undefined') {
-    Object.keys(sessionStorage).forEach((key) => {
-      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-        sessionStorage.removeItem(key);
-      }
-    });
-  }
-};
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -100,32 +79,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log('Setting up auth state listener...');
     
-    // Configurar listener de mudanças de auth PRIMEIRO
+    // Configurar listener de mudanças de auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
         
-        // Atualizar estado síncrono primeiro
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Buscar perfil do usuário se autenticado
+        // Buscar perfil apenas se usuário estiver logado
         if (session?.user) {
-          // Usar setTimeout para evitar deadlocks
-          setTimeout(async () => {
-            const profile = await fetchUserProfile(session.user.id);
-            setUserProfile(profile);
-            
-            // Se o perfil não foi encontrado, pode ser que o trigger falhou
-            if (!profile) {
-              console.warn('Profile not found for user, trigger may have failed');
-              toast({
-                title: "Aviso",
-                description: "Perfil do usuário não foi criado automaticamente. Entre em contato com o suporte.",
-                variant: "destructive",
-              });
-            }
-          }, 0);
+          const profile = await fetchUserProfile(session.user.id);
+          setUserProfile(profile);
         } else {
           setUserProfile(null);
         }
@@ -134,7 +99,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     );
 
-    // DEPOIS verificar sessão existente
+    // Verificar sessão existente
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) {
         console.error('Error getting session:', error);
@@ -162,25 +127,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Starting signup process for:', email);
       setLoading(true);
       
-      // Limpar estado antes do signup
-      cleanupAuthState();
-      
-      // Tentar logout global primeiro
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        console.log('Global signout failed (expected):', err);
-      }
-
-      const redirectUrl = `${window.location.origin}/`;
-      
-      console.log('Calling supabase.auth.signUp with:', { email, userData });
-      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl,
+          emailRedirectTo: `${window.location.origin}/`,
           data: userData
         }
       });
@@ -191,39 +142,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error('Signup error:', error);
         toast({
           title: "Erro no cadastro",
-          description: `${error.message} (Código: ${error.status})`,
+          description: error.message,
           variant: "destructive",
         });
       } else {
-        console.log('Signup successful:', data);
-        
-        // Verificar se o usuário foi criado
-        if (data?.user) {
-          console.log('User created with ID:', data.user.id);
-          
-          // Aguardar um pouco e verificar se o perfil foi criado
-          setTimeout(async () => {
-            const profile = await fetchUserProfile(data.user.id);
-            if (profile) {
-              console.log('Profile created successfully:', profile);
-              toast({
-                title: "Cadastro realizado!",
-                description: "Conta criada com sucesso. Verifique seu email se necessário.",
-              });
-            } else {
-              console.warn('Profile not created automatically');
-              toast({
-                title: "Cadastro parcialmente realizado",
-                description: "Usuário criado, mas perfil não foi configurado automaticamente.",
-                variant: "destructive",
-              });
-            }
-          }, 2000);
-        }
-        
+        console.log('Signup successful');
         toast({
-          title: "Cadastro iniciado!",
-          description: "Verifique seu email para confirmar a conta ou faça login se já confirmou.",
+          title: "Cadastro realizado!",
+          description: "Verifique seu email para confirmar a conta.",
         });
       }
 
@@ -246,16 +172,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Starting signin process for:', email);
       setLoading(true);
       
-      // Limpar estado antes do login
-      cleanupAuthState();
-      
-      // Tentar logout global primeiro
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        console.log('Global signout failed (expected):', err);
-      }
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -265,20 +181,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error('Signin error:', error);
         toast({
           title: "Erro no login",
-          description: `${error.message} (Código: ${error.status})`,
+          description: error.message,
           variant: "destructive",
         });
       } else {
-        console.log('Signin successful:', data);
+        console.log('Signin successful');
         toast({
           title: "Login realizado!",
           description: "Bem-vindo ao sistema.",
         });
-        
-        // Forçar refresh da página para estado limpo
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 1000);
       }
 
       return { error };
@@ -300,11 +211,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Starting signout process');
       setLoading(true);
       
-      // Limpar estado primeiro
-      cleanupAuthState();
-      
-      // Tentar logout global
-      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      const { error } = await supabase.auth.signOut();
       
       if (error) {
         console.error('Signout error:', error);
@@ -319,11 +226,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           description: "Você foi desconectado com sucesso.",
         });
       }
-      
-      // Forçar refresh para estado limpo
-      setTimeout(() => {
-        window.location.href = '/auth';
-      }, 500);
       
     } catch (error: any) {
       console.error('Signout exception:', error);
