@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Eye, EyeOff } from 'lucide-react';
 
 const AuthPage = () => {
-  const { user, signIn, signUp, loading } = useAuth();
+  const { user, signIn, signUp, loading, userProfile } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,8 +29,10 @@ const AuthPage = () => {
   });
 
   // Redirect if already authenticated
-  if (user && !loading) {
-    const userRole = user.user_metadata?.role || 'investor';
+  if (user && !loading && userProfile) {
+    const userRole = userProfile.role || 'investor';
+    console.log('Redirecting user with role:', userRole);
+    
     if (userRole === 'admin') {
       return <Navigate to="/admin/dashboard" replace />;
     } else if (userRole === 'partner') {
@@ -46,7 +48,7 @@ const AuthPage = () => {
     const { error } = await signIn(loginForm.email, loginForm.password);
     
     if (!error) {
-      // Navigation will happen automatically via useAuth
+      // Navigation will happen automatically via useAuth and redirect logic above
     }
     
     setIsLoading(false);

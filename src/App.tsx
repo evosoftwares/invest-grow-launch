@@ -16,7 +16,6 @@ import ReportsPage from "./pages/admin/ReportsPage";
 import PartnerDashboard from "./pages/partner/PartnerDashboard";
 import PartnerLinks from "./pages/partner/PartnerLinks";
 import PartnerCommissions from "./pages/partner/PartnerCommissions";
-import AdminLogin from "./pages/admin/AdminLogin";
 import AuthPage from "./components/auth/AuthPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -41,7 +40,6 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/calculadora" element={<ROICalculatorPage />} />
             <Route path="/auth" element={<AuthPage />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
             <Route 
               path="/admin/dashboard" 
               element={

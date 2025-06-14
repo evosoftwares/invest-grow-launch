@@ -29,6 +29,7 @@ export const useInvestors = () => {
   return useQuery({
     queryKey: ['investors'],
     queryFn: async () => {
+      console.log('Fetching investors...');
       const { data, error } = await supabase
         .from('investors')
         .select('*')
@@ -39,6 +40,7 @@ export const useInvestors = () => {
         throw error;
       }
 
+      console.log('Investors fetched:', data?.length);
       return data as Investor[];
     },
   });
@@ -64,12 +66,14 @@ export const useInvestorMutations = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['investors'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-data'] });
       toast({
         title: "Investidor criado",
         description: "Investidor foi criado com sucesso.",
       });
     },
     onError: (error: any) => {
+      console.error('Error creating investor:', error);
       toast({
         title: "Erro ao criar investidor",
         description: error.message,
@@ -79,10 +83,19 @@ export const useInvestorMutations = () => {
   });
 
   const updateInvestorStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: 'lead' | 'contacted' | 'proposal_sent' | 'negotiation' | 'analysis' | 'invested' | 'lost' }) => {
+    mutationFn: async ({ 
+      id, 
+      status 
+    }: { 
+      id: string; 
+      status: 'lead' | 'contacted' | 'proposal_sent' | 'negotiation' | 'analysis' | 'invested' | 'lost' 
+    }) => {
       const { data, error } = await supabase
         .from('investors')
-        .update({ status })
+        .update({ 
+          status,
+          last_contact_date: new Date().toISOString()
+        })
         .eq('id', id)
         .select()
         .single();
@@ -92,14 +105,43 @@ export const useInvestorMutations = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['investors'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-data'] });
       toast({
         title: "Status atualizado",
         description: "Status do investidor foi atualizado com sucesso.",
       });
     },
     onError: (error: any) => {
+      console.error('Error updating investor status:', error);
       toast({
         title: "Erro ao atualizar status",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteInvestor = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('investors')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['investors'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-data'] });
+      toast({
+        title: "Investidor removido",
+        description: "Investidor foi removido com sucesso.",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error deleting investor:', error);
+      toast({
+        title: "Erro ao remover investidor",
         description: error.message,
         variant: "destructive",
       });
@@ -109,5 +151,6 @@ export const useInvestorMutations = () => {
   return {
     createInvestor,
     updateInvestorStatus,
+    deleteInvestor,
   };
 };
