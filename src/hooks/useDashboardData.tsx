@@ -45,8 +45,13 @@ export const useDashboardData = () => {
         return sum + (inv.status === 'paid' ? Number(inv.amount) : 0);
       }, 0) || 0;
       
-      // Meta de investimento
-      const investmentGoal = settingsQuery.data?.[0]?.value || 2500000;
+      // Meta de investimento - converter adequadamente o valor do JSON
+      const investmentGoalValue = settingsQuery.data?.[0]?.value;
+      const investmentGoal = typeof investmentGoalValue === 'string' ? 
+        parseInt(investmentGoalValue, 10) : 
+        typeof investmentGoalValue === 'number' ? 
+        investmentGoalValue : 
+        2500000;
       
       // Taxa de conversão (investimentos pagos vs total de leads)
       const paidInvestments = investmentsQuery.data?.filter(i => i.status === 'paid').length || 0;
