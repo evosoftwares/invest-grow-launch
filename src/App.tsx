@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +17,7 @@ import PartnerLinks from "./pages/partner/PartnerLinks";
 import PartnerCommissions from "./pages/partner/PartnerCommissions";
 import AuthPage from "./components/auth/AuthPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Create a stable query client instance
 const queryClient = new QueryClient({
@@ -30,87 +30,89 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/calculadora" element={<ROICalculatorPage />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route 
-              path="/admin/dashboard" 
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin/investors" 
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <InvestorsManagement />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin/partners" 
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <PartnersManagement />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin/financial" 
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <FinancialManagement />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin/reports" 
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <ReportsPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/partner/dashboard" 
-              element={
-                <ProtectedRoute requiredRole="partner">
-                  <PartnerDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/partner/links" 
-              element={
-                <ProtectedRoute requiredRole="partner">
-                  <PartnerLinks />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/partner/commissions" 
-              element={
-                <ProtectedRoute requiredRole="partner">
-                  <PartnerCommissions />
-                </ProtectedRoute>
-              } 
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/calculadora" element={<ROICalculatorPage />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route 
+                path="/admin/dashboard" 
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/investors" 
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <InvestorsManagement />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/partners" 
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <PartnersManagement />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/financial" 
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <FinancialManagement />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/reports" 
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <ReportsPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/partner/dashboard" 
+                element={
+                  <ProtectedRoute requiredRole="partner">
+                    <PartnerDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/partner/links" 
+                element={
+                  <ProtectedRoute requiredRole="partner">
+                    <PartnerLinks />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/partner/commissions" 
+                element={
+                  <ProtectedRoute requiredRole="partner">
+                    <PartnerCommissions />
+                  </ProtectedRoute>
+                } 
+              />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

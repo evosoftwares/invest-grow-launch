@@ -1,35 +1,33 @@
 
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { 
   LayoutDashboard, 
   Users, 
-  UserPlus, 
+  UserCheck, 
   DollarSign, 
   BarChart3, 
   LogOut,
-  Menu,
-  X
-} from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+  Home
+} from 'lucide-react';
 
 interface AdminLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, userProfile } = useAuth();
 
-  const navigation = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Investidores', href: '/admin/investors', icon: Users },
-    { name: 'Parceiros', href: '/admin/partners', icon: UserPlus },
-    { name: 'Financeiro', href: '/admin/financial', icon: DollarSign },
-    { name: 'Relatórios', href: '/admin/reports', icon: BarChart3 },
+  const menuItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
+    { icon: Users, label: 'Investidores', path: '/admin/investors' },
+    { icon: UserCheck, label: 'Parceiros', path: '/admin/partners' },
+    { icon: DollarSign, label: 'Financeiro', path: '/admin/financial' },
+    { icon: BarChart3, label: 'Relatórios', path: '/admin/reports' },
   ];
 
   const handleLogout = async () => {
@@ -39,107 +37,72 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar */}
-      <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
-        <div className="fixed inset-0 bg-gray-900/80" onClick={() => setSidebarOpen(false)} />
-        <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl">
-          <div className="flex h-16 items-center justify-between px-6">
-            <img 
-              src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
-              alt="Futuro PDV" 
-              className="h-8 w-auto"
-            />
-            <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
-              <X className="h-5 w-5" />
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/')}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              <Home className="w-5 h-5 mr-2" />
+              Voltar ao Site
             </Button>
+            <div className="w-px h-6 bg-gray-300" />
+            <h1 className="text-xl font-semibold text-gray-900">
+              Painel Administrativo
+            </h1>
           </div>
-          <nav className="mt-8 px-4">
-            {navigation.map((item) => {
-              const Icon = item.icon;
+          
+          <div className="flex items-center gap-4">
+            <NotificationBell />
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">
+                Olá, {userProfile?.full_name || 'Admin'}
+              </span>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleLogout}
+                className="text-gray-700 hover:text-gray-900"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="w-64 bg-white shadow-sm min-h-screen">
+          <nav className="p-4 space-y-2">
+            {menuItems.map((item) => {
+              const isActive = window.location.pathname === item.path;
               return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg mb-1 ${
-                    location.pathname === item.href
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
+                <Button
+                  key={item.path}
+                  variant={isActive ? "default" : "ghost"}
+                  className={`w-full justify-start ${
+                    isActive 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                   }`}
-                  onClick={() => setSidebarOpen(false)}
+                  onClick={() => navigate(item.path)}
                 >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Link>
+                  <item.icon className="w-4 h-4 mr-3" />
+                  {item.label}
+                </Button>
               );
             })}
           </nav>
-          <div className="absolute bottom-4 left-4 right-4">
-            <Button variant="outline" onClick={handleLogout} className="w-full">
-              <LogOut className="mr-2 h-4 w-4" />
-              Sair
-            </Button>
-          </div>
-        </div>
-      </div>
+        </aside>
 
-      {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white border-r border-gray-200 shadow-sm">
-          <div className="flex h-16 items-center px-6">
-            <img 
-              src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
-              alt="Futuro PDV" 
-              className="h-8 w-auto"
-            />
-          </div>
-          <nav className="mt-8 flex-1 px-4">
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg mb-1 ${
-                    location.pathname === item.href
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="p-4">
-            <Button variant="outline" onClick={handleLogout} className="w-full">
-              <LogOut className="mr-2 h-4 w-4" />
-              Sair
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="lg:pl-64">
-        <div className="flex h-16 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-            <div className="flex flex-1"></div>
-          </div>
-        </div>
-
-        <main className="py-10">
-          <div className="px-4 sm:px-6 lg:px-8">
-            {children}
-          </div>
+        {/* Main Content */}
+        <main className="flex-1">
+          {children}
         </main>
       </div>
     </div>
