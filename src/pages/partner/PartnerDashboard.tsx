@@ -18,18 +18,22 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { usePartnerId } from "@/hooks/usePartnerId";
+import { usePartnerCommissions } from "@/hooks/usePartnerCommissions";
 import PartnerErrorBoundary from "@/components/partner/PartnerErrorBoundary";
 
 const PartnerDashboardContent = () => {
   const navigate = useNavigate();
   const { signOut, userProfile } = useAuth();
   const { data: partnerId, isLoading: isLoadingPartnerId, error: partnerError } = usePartnerId();
+  const { data: commissions = [], isLoading: isLoadingCommissions } = usePartnerCommissions();
   
   // Buscar estatísticas específicas do parceiro
   const { data: partnerStats, isLoading } = useQuery({
     queryKey: ['partner-stats', partnerId],
     queryFn: async () => {
       if (!partnerId) return null;
+      
+      console.log('Fetching partner stats for partner:', partnerId);
       
       // Buscar investidores do parceiro
       const { data: investors } = await supabase
@@ -50,31 +54,56 @@ const PartnerDashboardContent = () => {
       const approvedInvestments = investments?.filter(inv => inv.status === 'approved' || inv.status === 'paid').length || 0;
       const conversionRate = totalInvestors > 0 ? (activeInvestors / totalInvestors) * 100 : 0;
       
-      // Mock de comissões (seria calculado baseado nos investimentos)
-      const totalCommissions = totalInvestments * 0.05; // 5% de comissão
-      const monthlyCommissions = totalCommissions * 0.1; // Mock de comissões do mês
+      console.log('Partner stats calculated:', {
+        totalInvestors,
+        activeInvestors,
+        totalInvestments,
+        approvedInvestments,
+        conversionRate
+      });
       
       return {
         totalInvestors,
         activeInvestors,
-        totalCommissions,
-        monthlyCommissions,
-        conversionRate,
+        totalInvestments,
         approvedInvestments,
-        totalInvestments
+        conversionRate
       };
     },
     enabled: !!partnerId
   });
 
-  const stats = partnerStats || {
+  // Calcular comissões baseadas nos dados reais
+  const commissionStats = {
+    totalCommissions: commissions.reduce((sum, comm) => sum + Number(comm.amount), 0),
+    paidCommissions: commissions
+      .filter(comm => comm.paid_at)
+      .reduce((sum, comm) => sum + Number(comm.amount), 0),
+    pendingCommissions: commissions
+      .filter(comm => !comm.paid_at)
+      .reduce((sum, comm) => sum + Number(comm.amount), 0),
+    monthlyCommissions: commissions
+      .filter(comm => {
+        const commDate = new Date(comm.calculated_at);
+        const now = new Date();
+        return commDate.getMonth() === now.getMonth() && commDate.getFullYear() === now.getFullYear();
+      })
+      .reduce((sum, comm) => sum + Number(comm.amount), 0)
+  };
+
+  const stats = partnerStats ? {
+    ...partnerStats,
+    ...commissionStats
+  } : {
     totalInvestors: 0,
     activeInvestors: 0,
-    totalCommissions: 0,
-    monthlyCommissions: 0,
-    conversionRate: 0,
+    totalInvestments: 0,
     approvedInvestments: 0,
-    totalInvestments: 0
+    conversionRate: 0,
+    totalCommissions: 0,
+    paidCommissions: 0,
+    pendingCommissions: 0,
+    monthlyCommissions: 0
   };
 
   const handleLogout = async () => {
@@ -82,7 +111,7 @@ const PartnerDashboardContent = () => {
     navigate('/auth');
   };
 
-  if (isLoadingPartnerId || isLoading) {
+  if (isLoadingPartnerId || isLoading || isLoadingCommissions) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -161,7 +190,7 @@ const PartnerDashboardContent = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Investidores</CardTitle>
@@ -177,13 +206,26 @@ const PartnerDashboardContent = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Comissões Estimadas</CardTitle>
+              <CardTitle className="text-sm font-medium">Comissões Totais</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">R$ {stats.totalCommissions.toLocaleString('pt-BR')}</div>
               <p className="text-xs text-muted-foreground">
-                +R$ {stats.monthlyCommissions.toLocaleString('pt-BR')} este mês
+                R$ {stats.paidCommissions.toLocaleString('pt-BR')} pagas
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Comissões Pendentes</CardTitle>
+              <DollarSign className="h-4 w-4 text-yellow-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-600">R$ {stats.pendingCommissions.toLocaleString('pt-BR')}</div>
+              <p className="text-xs text-muted-foreground">
+                Aguardando pagamento
               </p>
             </CardContent>
           </Card>
@@ -279,6 +321,13 @@ const PartnerDashboardContent = () => {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Investidores:</span>
                 <span className="text-sm font-bold">{stats.totalInvestors} cadastrados</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Este Mês:</span>
+                <span className="text-sm font-bold text-green-600">
+                  R$ {stats.monthlyCommissions.toLocaleString('pt-BR')}
+                </span>
               </div>
             </CardContent>
           </Card>
