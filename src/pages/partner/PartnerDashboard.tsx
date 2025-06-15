@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -79,19 +80,6 @@ const PartnerDashboardContent = () => {
       console.warn(`⚠️ Commission ${comm.id} has zero or negative amount:`, comm.amount);
     }
   });
-
-  // Log das comissões para debugging com validações
-  console.log('=== COMMISSION STATS VALIDATION ===');
-  console.log('Total commissions found:', commissions.length);
-  console.log('Commission stats calculated:', commissionStats);
-  
-  // Validar se total = pago + pendente
-  const calculatedTotal = commissionStats.paidCommissions + commissionStats.pendingCommissions;
-  if (Math.abs(calculatedTotal - commissionStats.totalCommissions) > 0.01) {
-    console.warn('⚠️ INCONSISTENCY: Total commissions != Paid + Pending');
-    console.warn('Total:', commissionStats.totalCommissions);
-    console.warn('Paid + Pending:', calculatedTotal);
-  }
 
   const stats = partnerStats ? {
     ...partnerStats,
