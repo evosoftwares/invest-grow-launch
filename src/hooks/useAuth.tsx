@@ -53,7 +53,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         full_name: userData?.full_name || user.email || '',
         role: userData?.role || 'investor',
         avatar_url: null,
-        phone: null
+        phone: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
       // Verificar se o perfil já existe

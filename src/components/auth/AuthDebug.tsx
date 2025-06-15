@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
 
 export const AuthDebug = () => {
-  const { testProfileCreation, user, userProfile } = useAuth();
+  const { user, userProfile } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
 
   if (!isVisible) {
@@ -58,17 +58,8 @@ export const AuthDebug = () => {
             )}
           </div>
           
-          <Button 
-            size="sm" 
-            variant="outline" 
-            onClick={testProfileCreation}
-            className="w-full"
-          >
-            Testar Criação de Perfis
-          </Button>
-          
           <div className="text-xs text-gray-500">
-            Use este botão para verificar quantos perfis existem no banco de dados.
+            Informações de debug para verificar o estado da autenticação.
           </div>
         </CardContent>
       </Card>
