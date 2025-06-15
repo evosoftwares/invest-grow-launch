@@ -1,350 +1,212 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { 
-  DollarSign, 
-  Clock, 
-  CheckCircle, 
-  Download,
-  TrendingUp,
-  Calendar
+  DollarSign,
+  ArrowLeft,
+  Calendar,
+  TrendingUp
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const PartnerCommissions = () => {
-  const [periodFilter, setPeriodFilter] = useState("all");
-
-  // Mock data - em produção viria de uma API
-  const commissionStats = {
-    totalRecebido: 42500,
-    pendente: 5000,
-    proximoPagamento: "2024-01-25",
-    totalIndicacoes: 15
-  };
-
+  const navigate = useNavigate();
+  const { signOut, userProfile } = useAuth();
+  
+  // Mock data - em produção virá da API
   const commissions = [
     {
       id: 1,
-      investor: "João Silva",
-      investmentAmount: 50000,
-      commissionAmount: 2500,
-      status: "paid",
-      paymentDate: "2024-01-20",
-      investmentDate: "2024-01-15",
-      paymentMethod: "PIX"
+      investor_name: "João Silva",
+      type: "inicial",
+      amount: 500.00,
+      investment_amount: 10000.00,
+      rate: 5,
+      date: "2024-01-15",
+      status: "pago"
     },
     {
       id: 2,
-      investor: "Carlos Oliveira",
-      investmentAmount: 25000,
-      commissionAmount: 1250,
-      status: "paid",
-      paymentDate: "2024-01-18",
-      investmentDate: "2024-01-13",
-      paymentMethod: "TED"
+      investor_name: "Maria Santos",
+      type: "recorrente",
+      amount: 75.00,
+      investment_amount: 3000.00,
+      rate: 2.5,
+      date: "2024-01-20",
+      status: "pendente"
     },
     {
       id: 3,
-      investor: "Ana Costa",
-      investmentAmount: 75000,
-      commissionAmount: 3750,
-      status: "pending",
-      paymentDate: "2024-01-25",
-      investmentDate: "2024-01-12",
-      paymentMethod: "PIX"
-    },
-    {
-      id: 4,
-      investor: "Maria Santos",
-      investmentAmount: 100000,
-      commissionAmount: 5000,
-      status: "processing",
-      paymentDate: "2024-01-25",
-      investmentDate: "2024-01-14",
-      paymentMethod: "PIX"
-    },
-    {
-      id: 5,
-      investor: "Pedro Lima",
-      investmentAmount: 30000,
-      commissionAmount: 1500,
-      status: "paid",
-      paymentDate: "2024-01-15",
-      investmentDate: "2024-01-10",
-      paymentMethod: "PIX"
+      investor_name: "Carlos Oliveira",
+      type: "inicial",
+      amount: 250.00,
+      investment_amount: 5000.00,
+      rate: 5,
+      date: "2024-01-25",
+      status: "pago"
     }
   ];
 
-  const getStatusBadge = (status: string) => {
-    const statusMap = {
-      paid: { label: "Pago", color: "bg-green-100 text-green-800", icon: CheckCircle },
-      pending: { label: "Pendente", color: "bg-yellow-100 text-yellow-800", icon: Clock },
-      processing: { label: "Processando", color: "bg-blue-100 text-blue-800", icon: Clock }
-    };
-    
-    const statusInfo = statusMap[status as keyof typeof statusMap] || statusMap.pending;
-    const Icon = statusInfo.icon;
-    
-    return (
-      <Badge className={statusInfo.color}>
-        <Icon className="w-3 h-3 mr-1" />
-        {statusInfo.label}
-      </Badge>
-    );
+  const totalPaid = commissions.filter(c => c.status === 'pago').reduce((acc, c) => acc + c.amount, 0);
+  const totalPending = commissions.filter(c => c.status === 'pendente').reduce((acc, c) => acc + c.amount, 0);
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
   };
 
-  const filteredCommissions = commissions.filter(commission => {
-    if (periodFilter === "all") return true;
-    if (periodFilter === "paid") return commission.status === "paid";
-    if (periodFilter === "pending") return commission.status === "pending" || commission.status === "processing";
-    return true;
-  });
+  const getStatusBadge = (status: string) => {
+    if (status === 'pago') {
+      return <Badge className="bg-green-100 text-green-800">Pago</Badge>;
+    } else if (status === 'pendente') {
+      return <Badge className="bg-yellow-100 text-yellow-800">Pendente</Badge>;
+    }
+    return <Badge variant="outline">{status}</Badge>;
+  };
+
+  const getTypeBadge = (type: string) => {
+    if (type === 'inicial') {
+      return <Badge className="bg-blue-100 text-blue-800">Inicial</Badge>;
+    } else if (type === 'recorrente') {
+      return <Badge className="bg-purple-100 text-purple-800">Recorrente</Badge>;
+    }
+    return <Badge variant="outline">{type}</Badge>;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <img 
-                src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
-                alt="Futuro PDV" 
-                className="h-8 w-auto mr-4"
-              />
-              <div>
-                <h1 className="text-xl font-semibold">Minhas Comissões</h1>
-                <p className="text-sm text-gray-600">Histórico e pagamentos de comissões</p>
-              </div>
-            </div>
-            <div className="flex space-x-2">
-              <Button variant="outline">
-                <Download className="w-4 h-4 mr-2" />
-                Exportar
-              </Button>
-              <Link to="/partner/dashboard">
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  Voltar ao Dashboard
-                </Button>
-              </Link>
-            </div>
+      <header className="bg-white shadow-sm border-b">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-4">
+            <img 
+              src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
+              alt="Futuro PDV" 
+              className="h-10 w-auto cursor-pointer"
+              onClick={() => navigate('/')}
+            />
+            <div className="w-px h-6 bg-gray-300" />
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/partner/dashboard')}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+            <h1 className="text-xl font-semibold text-gray-900">
+              Histórico de Comissões
+            </h1>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">
+              Olá, {userProfile?.full_name || 'Parceiro'}
+            </span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleLogout}
+            >
+              Sair
+            </Button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Recebido</p>
-                    <p className="text-2xl font-bold text-green-600">
-                      R$ {(commissionStats.totalRecebido / 1000).toFixed(1)}K
-                    </p>
-                  </div>
-                  <div className="p-3 bg-green-100 rounded-full">
-                    <CheckCircle className="h-6 w-6 text-green-600" />
-                  </div>
-                </div>
-                <div className="mt-4 text-sm text-gray-600">
-                  De {commissionStats.totalIndicacoes} indicações
-                </div>
-              </CardContent>
-            </Card>
+      <div className="p-6">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Suas Comissões
+          </h2>
+          <p className="text-gray-600">
+            Acompanhe o histórico completo das suas comissões por indicação.
+          </p>
+        </div>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Pendente</p>
-                    <p className="text-2xl font-bold text-yellow-600">
-                      R$ {(commissionStats.pendente / 1000).toFixed(1)}K
-                    </p>
-                  </div>
-                  <div className="p-3 bg-yellow-100 rounded-full">
-                    <Clock className="h-6 w-6 text-yellow-600" />
-                  </div>
-                </div>
-                <div className="mt-4 text-sm text-gray-600">
-                  A receber em breve
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Próximo Pagamento</p>
-                    <p className="text-2xl font-bold text-blue-600">25/01</p>
-                  </div>
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <Calendar className="h-6 w-6 text-blue-600" />
-                  </div>
-                </div>
-                <div className="mt-4 text-sm text-gray-600">
-                  Segunda-feira
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Taxa Média</p>
-                    <p className="text-2xl font-bold text-purple-600">5%</p>
-                  </div>
-                  <div className="p-3 bg-purple-100 rounded-full">
-                    <TrendingUp className="h-6 w-6 text-purple-600" />
-                  </div>
-                </div>
-                <div className="mt-4 text-sm text-gray-600">
-                  Por indicação confirmada
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Filters */}
+        {/* Summary Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Filtros</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Recebido</CardTitle>
+              <DollarSign className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Select value={periodFilter} onValueChange={setPeriodFilter}>
-                  <SelectTrigger className="w-full sm:w-48">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas as Comissões</SelectItem>
-                    <SelectItem value="paid">Pagas</SelectItem>
-                    <SelectItem value="pending">Pendentes</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="text-2xl font-bold text-green-600">
+                R$ {totalPaid.toLocaleString('pt-BR')}
               </div>
             </CardContent>
           </Card>
 
-          {/* Commissions Table */}
           <Card>
-            <CardHeader>
-              <CardTitle>Histórico de Comissões ({filteredCommissions.length})</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pendente</CardTitle>
+              <Calendar className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Investidor</TableHead>
-                      <TableHead>Valor Investido</TableHead>
-                      <TableHead>Comissão</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Data Investimento</TableHead>
-                      <TableHead>Data Pagamento</TableHead>
-                      <TableHead>Método</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredCommissions.map((commission) => (
-                      <TableRow key={commission.id}>
-                        <TableCell className="font-medium">{commission.investor}</TableCell>
-                        <TableCell>
-                          R$ {commission.investmentAmount.toLocaleString('pt-BR')}
-                        </TableCell>
-                        <TableCell className="font-semibold text-green-600">
-                          R$ {commission.commissionAmount.toLocaleString('pt-BR')}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(commission.status)}</TableCell>
-                        <TableCell>{commission.investmentDate}</TableCell>
-                        <TableCell>
-                          {commission.status === 'paid' ? commission.paymentDate : commission.paymentDate}
-                        </TableCell>
-                        <TableCell>{commission.paymentMethod}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <div className="text-2xl font-bold text-yellow-600">
+                R$ {totalPending.toLocaleString('pt-BR')}
               </div>
             </CardContent>
           </Card>
 
-          {/* Payment Schedule */}
           <Card>
-            <CardHeader>
-              <CardTitle>Cronograma de Pagamentos</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Geral</CardTitle>
+              <TrendingUp className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <div>
-                    <p className="font-medium">Próximo Pagamento</p>
-                    <p className="text-sm text-gray-600">25 de Janeiro de 2024</p>
+              <div className="text-2xl font-bold text-blue-600">
+                R$ {(totalPaid + totalPending).toLocaleString('pt-BR')}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Commissions List */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Histórico Detalhado</CardTitle>
+            <CardDescription>
+              Lista completa de todas as suas comissões
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {commissions.map((commission) => (
+                <div key={commission.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-semibold">{commission.investor_name}</h3>
+                      {getTypeBadge(commission.type)}
+                      {getStatusBadge(commission.status)}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <div>Investimento: R$ {commission.investment_amount.toLocaleString('pt-BR')}</div>
+                      <div>Taxa: {commission.rate}%</div>
+                      <div>Data: {new Date(commission.date).toLocaleDateString('pt-BR')}</div>
+                    </div>
                   </div>
+                  
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-yellow-600">R$ 8.750</p>
-                    <p className="text-sm text-gray-600">2 comissões pendentes</p>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <h4 className="font-medium mb-2">✅ Como Funcionam os Pagamentos</h4>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Pagamentos realizados toda segunda-feira</li>
-                      <li>• Comissões pagas após confirmação do investimento</li>
-                      <li>• Prazo de 5 dias úteis para processamento</li>
-                      <li>• Pagamento via PIX ou TED</li>
-                    </ul>
-                  </div>
-
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h4 className="font-medium mb-2">📊 Sua Performance</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Taxa de comissão:</span>
-                        <span className="font-semibold">5%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Total de indicações:</span>
-                        <span className="font-semibold">15</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Taxa de conversão:</span>
-                        <span className="font-semibold">18.5%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Ticket médio:</span>
-                        <span className="font-semibold">R$ 56.667</span>
-                      </div>
+                    <div className="text-2xl font-bold text-green-600">
+                      R$ {commission.amount.toLocaleString('pt-BR')}
                     </div>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {commissions.length === 0 && (
+              <div className="text-center py-12 text-gray-500">
+                <DollarSign className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-semibold mb-2">Nenhuma comissão ainda</h3>
+                <p>Suas comissões aparecerão aqui assim que você fizer suas primeiras indicações.</p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
