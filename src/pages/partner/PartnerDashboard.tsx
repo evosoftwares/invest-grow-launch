@@ -1,94 +1,23 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Users, 
-  DollarSign, 
-  TrendingUp, 
-  UserPlus,
-  Eye,
-  PlusCircle,
-  ExternalLink,
-  AlertCircle,
-  RefreshCw
-} from "lucide-react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { usePartnerId } from "@/hooks/usePartnerId";
 import { usePartnerCommissions } from "@/hooks/usePartnerCommissions";
+import { usePartnerStats } from "@/hooks/usePartnerStats";
 import PartnerErrorBoundary from "@/components/partner/PartnerErrorBoundary";
+import PartnerDashboardHeader from "@/components/partner/PartnerDashboardHeader";
+import PartnerStatsCards from "@/components/partner/PartnerStatsCards";
+import PartnerQuickActions from "@/components/partner/PartnerQuickActions";
+import PartnerAccountStatus from "@/components/partner/PartnerAccountStatus";
 
 const PartnerDashboardContent = () => {
   const navigate = useNavigate();
   const { signOut, userProfile } = useAuth();
   const { data: partnerId, isLoading: isLoadingPartnerId, error: partnerError } = usePartnerId();
   const { data: commissions = [], isLoading: isLoadingCommissions } = usePartnerCommissions();
-  
-  // Buscar estatísticas específicas do parceiro com cálculos corrigidos
-  const { data: partnerStats, isLoading } = useQuery({
-    queryKey: ['partner-stats', partnerId],
-    queryFn: async () => {
-      if (!partnerId) return null;
-      
-      console.log('Fetching partner stats for partner:', partnerId);
-      
-      // Buscar investidores do parceiro
-      const { data: investors } = await supabase
-        .from('investors')
-        .select('*')
-        .eq('partner_id', partnerId);
-      
-      console.log('Total investors found:', investors?.length);
-      
-      // Buscar investimentos dos investidores do parceiro
-      const { data: investments } = await supabase
-        .from('investments')
-        .select('amount, status, investor_id')
-        .eq('partner_id', partnerId);
-      
-      console.log('Total investments found:', investments?.length);
-      
-      // Calcular estatísticas corrigidas
-      const totalInvestors = investors?.length || 0;
-      
-      // Investidores ativos: aqueles que têm pelo menos um investimento
-      const investorIdsWithInvestments = new Set(investments?.map(inv => inv.investor_id) || []);
-      const activeInvestors = investorIdsWithInvestments.size;
-      
-      console.log('Investors with investments:', activeInvestors);
-      
-      // Total de investimentos
-      const totalInvestments = investments?.reduce((sum, inv) => sum + Number(inv.amount), 0) || 0;
-      
-      // Investimentos aprovados (status = 'approved' ou 'paid')
-      const approvedInvestments = investments?.filter(inv => 
-        inv.status === 'approved' || inv.status === 'paid'
-      ).length || 0;
-      
-      // Taxa de conversão corrigida: investidores com investimentos / total de investidores
-      const conversionRate = totalInvestors > 0 ? (activeInvestors / totalInvestors) * 100 : 0;
-      
-      console.log('Partner stats calculated:', {
-        totalInvestors,
-        activeInvestors,
-        totalInvestments,
-        approvedInvestments,
-        conversionRate
-      });
-      
-      return {
-        totalInvestors,
-        activeInvestors,
-        totalInvestments,
-        approvedInvestments,
-        conversionRate
-      };
-    },
-    enabled: !!partnerId
-  });
+  const { data: partnerStats, isLoading } = usePartnerStats(partnerId);
 
   // Calcular comissões baseadas nos dados reais
   const commissionStats = {
@@ -171,36 +100,10 @@ const PartnerDashboardContent = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
-            <img 
-              src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
-              alt="Futuro PDV" 
-              className="h-10 w-auto cursor-pointer"
-              onClick={() => navigate('/')}
-            />
-            <div className="w-px h-6 bg-gray-300" />
-            <h1 className="text-xl font-semibold text-gray-900">
-              Dashboard do Parceiro
-            </h1>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">
-              Olá, {userProfile?.full_name || 'Parceiro'}
-            </span>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleLogout}
-            >
-              Sair
-            </Button>
-          </div>
-        </div>
-      </header>
+      <PartnerDashboardHeader 
+        userFullName={userProfile?.full_name}
+        onLogout={handleLogout}
+      />
 
       <div className="p-6">
         <div className="mb-8">
@@ -212,148 +115,11 @@ const PartnerDashboardContent = () => {
           </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Investidores</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalInvestors}</div>
-              <p className="text-xs text-muted-foreground">
-                {stats.activeInvestors} com investimentos
-              </p>
-            </CardContent>
-          </Card>
+        <PartnerStatsCards stats={stats} />
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Comissões Totais</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">R$ {stats.totalCommissions.toLocaleString('pt-BR')}</div>
-              <p className="text-xs text-muted-foreground">
-                R$ {stats.paidCommissions.toLocaleString('pt-BR')} pagas
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Comissões Pendentes</CardTitle>
-              <DollarSign className="h-4 w-4 text-yellow-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">R$ {stats.pendingCommissions.toLocaleString('pt-BR')}</div>
-              <p className="text-xs text-muted-foreground">
-                Aguardando pagamento
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Taxa de Conversão</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.conversionRate.toFixed(1)}%</div>
-              <p className="text-xs text-muted-foreground">
-                {stats.approvedInvestments} investimentos aprovados
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Ações Rápidas</CardTitle>
-              <CardDescription>
-                Gerencie seus investidores e acompanhe o desempenho
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button 
-                onClick={() => navigate('/partner/investors/new')}
-                className="w-full justify-start"
-                variant="default"
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Cadastrar Novo Investidor
-              </Button>
-              
-              <Button 
-                onClick={() => navigate('/partner/investors')}
-                className="w-full justify-start"
-                variant="outline"
-              >
-                <Eye className="mr-2 h-4 w-4" />
-                Ver Meus Investidores
-              </Button>
-              
-              <Button 
-                onClick={() => navigate('/partner/links')}
-                className="w-full justify-start"
-                variant="outline"
-                disabled={!partnerId}
-              >
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Gerenciar Links de Indicação
-              </Button>
-              
-              <Button 
-                onClick={() => navigate('/partner/commissions')}
-                className="w-full justify-start"
-                variant="outline"
-              >
-                <DollarSign className="mr-2 h-4 w-4" />
-                Ver Histórico de Comissões
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Status da Conta</CardTitle>
-              <CardDescription>
-                Informações sobre sua conta de parceiro
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Status:</span>
-                <Badge className="bg-green-100 text-green-800">
-                  {partnerId ? 'Ativo' : 'Configurando'}
-                </Badge>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Nível:</span>
-                <Badge variant="outline">Parceiro Padrão</Badge>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Comissão:</span>
-                <span className="text-sm font-bold">5% inicial / 2,5% recorrente</span>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Investidores:</span>
-                <span className="text-sm font-bold">{stats.totalInvestors} cadastrados</span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Este Mês:</span>
-                <span className="text-sm font-bold text-green-600">
-                  R$ {stats.monthlyCommissions.toLocaleString('pt-BR')}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+          <PartnerQuickActions partnerId={partnerId} />
+          <PartnerAccountStatus partnerId={partnerId} stats={stats} />
         </div>
       </div>
     </div>
