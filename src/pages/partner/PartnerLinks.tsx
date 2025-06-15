@@ -9,20 +9,22 @@ import {
   ExternalLink,
   ArrowLeft,
   Trash2,
-  Edit
+  AlertCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/components/ui/use-toast";
 import { usePartnerLinks, usePartnerLinkMutations } from "@/hooks/usePartnerLinks";
+import { usePartnerId } from "@/hooks/usePartnerId";
 import { CreateLinkModal } from "@/components/partner/CreateLinkModal";
 
 const PartnerLinks = () => {
   const navigate = useNavigate();
   const { signOut, userProfile } = useAuth();
+  const { data: partnerId, isLoading: isLoadingPartnerId } = usePartnerId();
   
   // Buscar dados reais dos links
-  const { data: links = [], isLoading, error } = usePartnerLinks(userProfile?.id);
+  const { data: links = [], isLoading, error } = usePartnerLinks();
   const { deletePartnerLink } = usePartnerLinkMutations();
 
   const handleLogout = async () => {
@@ -44,12 +46,29 @@ const PartnerLinks = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoadingPartnerId || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Carregando links...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!partnerId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Erro de Configuração</h2>
+          <p className="text-gray-600 mb-4">
+            Não foi possível encontrar seus dados de parceiro. Entre em contato com o suporte.
+          </p>
+          <Button onClick={() => navigate('/partner/dashboard')}>
+            Voltar ao Dashboard
+          </Button>
         </div>
       </div>
     );
@@ -119,9 +138,7 @@ const PartnerLinks = () => {
             </p>
           </div>
           
-          {userProfile?.id && (
-            <CreateLinkModal partnerId={userProfile.id} />
-          )}
+          <CreateLinkModal />
         </div>
 
         <div className="space-y-4">
@@ -211,9 +228,7 @@ const PartnerLinks = () => {
                 <h3 className="text-lg font-semibold mb-2">Nenhum link criado ainda</h3>
                 <p>Crie seu primeiro link de indicação para começar a ganhar comissões.</p>
               </div>
-              {userProfile?.id && (
-                <CreateLinkModal partnerId={userProfile.id} />
-              )}
+              <CreateLinkModal />
             </CardContent>
           </Card>
         )}

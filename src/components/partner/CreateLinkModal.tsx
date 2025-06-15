@@ -15,13 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
 import { usePartnerLinkMutations } from "@/hooks/usePartnerLinks";
-import { useAuth } from "@/hooks/useAuth";
 
-interface CreateLinkModalProps {
-  partnerId: string;
-}
-
-export const CreateLinkModal = ({ partnerId }: CreateLinkModalProps) => {
+export const CreateLinkModal = () => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -40,7 +35,6 @@ export const CreateLinkModal = ({ partnerId }: CreateLinkModalProps) => {
     
     try {
       await createPartnerLink.mutateAsync({
-        partner_id: partnerId,
         name: name.trim(),
         description: description.trim() || undefined,
       });

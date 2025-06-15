@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
+import { usePartnerId } from './usePartnerId';
 
 export interface PartnerLink {
   id: string;
@@ -28,7 +29,9 @@ const generateUniqueCode = () => {
   return result;
 };
 
-export const usePartnerLinks = (partnerId?: string) => {
+export const usePartnerLinks = () => {
+  const { data: partnerId } = usePartnerId();
+  
   return useQuery({
     queryKey: ['partner-links', partnerId],
     queryFn: async () => {
@@ -55,13 +58,17 @@ export const usePartnerLinks = (partnerId?: string) => {
 
 export const usePartnerLinkMutations = () => {
   const queryClient = useQueryClient();
+  const { data: partnerId } = usePartnerId();
 
   const createPartnerLink = useMutation({
     mutationFn: async (linkData: {
-      partner_id: string;
       name: string;
       description?: string;
     }) => {
+      if (!partnerId) {
+        throw new Error('Partner ID não encontrado');
+      }
+
       // Gerar código único
       let code = generateUniqueCode();
       let isUnique = false;
@@ -86,7 +93,7 @@ export const usePartnerLinkMutations = () => {
       const { data, error } = await supabase
         .from('partner_links')
         .insert([{
-          partner_id: linkData.partner_id,
+          partner_id: partnerId,
           name: linkData.name,
           description: linkData.description,
           code: code,

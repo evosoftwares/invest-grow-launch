@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     // Configurar listener de mudanças de auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
         
         setSession(session);
@@ -287,24 +287,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           description: "Bem-vindo ao sistema.",
         });
 
-        // Redirecionamento baseado no role
-        const role = profile?.role || 'investor';
-        console.log('Redirecting user with role:', role);
-        
-        // Usar setTimeout para garantir que o estado seja atualizado
-        setTimeout(() => {
-          switch (role) {
-            case 'admin':
-              window.location.href = '/admin/dashboard';
-              break;
-            case 'partner':
-              window.location.href = '/partner/dashboard';
-              break;
-            default:
-              window.location.href = '/calculadora';
-              break;
-          }
-        }, 1000);
+        // Navigation será tratada pelo componente que chama signIn
+        console.log('User signed in with role:', profile?.role);
       }
 
       return { error };
@@ -344,9 +328,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         title: "Logout realizado",
         description: "Você foi desconectado com sucesso.",
       });
-      
-      // Redirecionar para página inicial com reload completo
-      window.location.href = '/';
       
     } catch (error: any) {
       console.error('Signout exception:', error);

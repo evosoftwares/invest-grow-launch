@@ -8,43 +8,37 @@ import {
   TrendingUp, 
   UserPlus,
   Eye,
-  PlusCircle
+  PlusCircle,
+  ExternalLink
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { usePartnerId } from "@/hooks/usePartnerId";
 
 const PartnerDashboard = () => {
   const navigate = useNavigate();
   const { signOut, userProfile } = useAuth();
+  const { data: partnerId, isLoading: isLoadingPartnerId } = usePartnerId();
   
   // Buscar estatísticas específicas do parceiro
   const { data: partnerStats, isLoading } = useQuery({
-    queryKey: ['partner-stats', userProfile?.id],
+    queryKey: ['partner-stats', partnerId],
     queryFn: async () => {
-      if (!userProfile?.id) return null;
-      
-      // Buscar o partner_id baseado no profile_id
-      const { data: partnerData } = await supabase
-        .from('partners')
-        .select('id')
-        .eq('profile_id', userProfile.id)
-        .single();
-      
-      if (!partnerData) return null;
+      if (!partnerId) return null;
       
       // Buscar investidores do parceiro
       const { data: investors } = await supabase
         .from('investors')
         .select('*')
-        .eq('partner_id', partnerData.id);
+        .eq('partner_id', partnerId);
       
       // Buscar investimentos dos investidores do parceiro
       const { data: investments } = await supabase
         .from('investments')
         .select('amount, status')
-        .eq('partner_id', partnerData.id);
+        .eq('partner_id', partnerId);
       
       // Calcular estatísticas
       const totalInvestors = investors?.length || 0;
@@ -67,7 +61,7 @@ const PartnerDashboard = () => {
         totalInvestments
       };
     },
-    enabled: !!userProfile?.id
+    enabled: !!partnerId
   });
 
   const stats = partnerStats || {
@@ -85,7 +79,7 @@ const PartnerDashboard = () => {
     navigate('/auth');
   };
 
-  if (isLoading) {
+  if (isLoadingPartnerId || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -204,6 +198,15 @@ const PartnerDashboard = () => {
               >
                 <Eye className="mr-2 h-4 w-4" />
                 Ver Meus Investidores
+              </Button>
+              
+              <Button 
+                onClick={() => navigate('/partner/links')}
+                className="w-full justify-start"
+                variant="outline"
+              >
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Gerenciar Links de Indicação
               </Button>
               
               <Button 
