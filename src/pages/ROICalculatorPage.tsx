@@ -1,20 +1,12 @@
 
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ROICalculator } from "@/components/ROICalculator";
-import { ROIChart } from "@/components/ROIChart";
-import { ROIProjection } from "@/components/ROIProjection";
 
 const ROICalculatorPage = () => {
   const navigate = useNavigate();
-  const [calculationData, setCalculationData] = useState(null);
-
-  const handleCalculationComplete = (data: any) => {
-    setCalculationData(data);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -53,40 +45,7 @@ const ROICalculatorPage = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Parâmetros de Investimento</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ROICalculator onCalculationComplete={handleCalculationComplete} />
-            </CardContent>
-          </Card>
-
-          <div className="space-y-6">
-            {calculationData && (
-              <>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Gráfico de Crescimento</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ROIChart data={calculationData} />
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Projeção Detalhada</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ROIProjection data={calculationData} />
-                  </CardContent>
-                </Card>
-              </>
-            )}
-          </div>
-        </div>
+        <ROICalculator />
       </div>
     </div>
   );
