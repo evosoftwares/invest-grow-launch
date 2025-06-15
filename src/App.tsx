@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +16,8 @@ import ReportsPage from "./pages/admin/ReportsPage";
 import PartnerDashboard from "./pages/partner/PartnerDashboard";
 import PartnerLinks from "./pages/partner/PartnerLinks";
 import PartnerCommissions from "./pages/partner/PartnerCommissions";
+import PartnerInvestors from "./pages/partner/PartnerInvestors";
+import InvestorRegistration from "./pages/partner/InvestorRegistration";
 import AuthPage from "./components/auth/AuthPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -86,6 +89,22 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredRole="partner">
                     <PartnerDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/partner/investors" 
+                element={
+                  <ProtectedRoute requiredRole="partner">
+                    <PartnerInvestors />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/partner/investors/new" 
+                element={
+                  <ProtectedRoute requiredRole="partner">
+                    <InvestorRegistration />
                   </ProtectedRoute>
                 } 
               />

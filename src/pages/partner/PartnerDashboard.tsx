@@ -6,31 +6,92 @@ import {
   Users, 
   DollarSign, 
   TrendingUp, 
-  Link as LinkIcon,
+  UserPlus,
   Eye,
-  UserPlus
+  PlusCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const PartnerDashboard = () => {
   const navigate = useNavigate();
   const { signOut, userProfile } = useAuth();
   
-  // Mock data - em produção virá da API
-  const stats = {
-    totalReferrals: 12,
-    activeInvestors: 8,
-    totalCommissions: 2450.00,
-    monthlyCommissions: 320.00,
-    conversionRate: 18.5,
-    clicks: 156
+  // Buscar estatísticas específicas do parceiro
+  const { data: partnerStats, isLoading } = useQuery({
+    queryKey: ['partner-stats', userProfile?.id],
+    queryFn: async () => {
+      if (!userProfile?.id) return null;
+      
+      // Buscar o partner_id baseado no profile_id
+      const { data: partnerData } = await supabase
+        .from('partners')
+        .select('id')
+        .eq('profile_id', userProfile.id)
+        .single();
+      
+      if (!partnerData) return null;
+      
+      // Buscar investidores do parceiro
+      const { data: investors } = await supabase
+        .from('investors')
+        .select('*')
+        .eq('partner_id', partnerData.id);
+      
+      // Buscar investimentos dos investidores do parceiro
+      const { data: investments } = await supabase
+        .from('investments')
+        .select('amount, status')
+        .eq('partner_id', partnerData.id);
+      
+      // Calcular estatísticas
+      const totalInvestors = investors?.length || 0;
+      const activeInvestors = investors?.filter(inv => inv.status === 'invested').length || 0;
+      const totalInvestments = investments?.reduce((sum, inv) => sum + Number(inv.amount), 0) || 0;
+      const approvedInvestments = investments?.filter(inv => inv.status === 'approved' || inv.status === 'paid').length || 0;
+      const conversionRate = totalInvestors > 0 ? (activeInvestors / totalInvestors) * 100 : 0;
+      
+      // Mock de comissões (seria calculado baseado nos investimentos)
+      const totalCommissions = totalInvestments * 0.05; // 5% de comissão
+      const monthlyCommissions = totalCommissions * 0.1; // Mock de comissões do mês
+      
+      return {
+        totalInvestors,
+        activeInvestors,
+        totalCommissions,
+        monthlyCommissions,
+        conversionRate,
+        approvedInvestments,
+        totalInvestments
+      };
+    },
+    enabled: !!userProfile?.id
+  });
+
+  const stats = partnerStats || {
+    totalInvestors: 0,
+    activeInvestors: 0,
+    totalCommissions: 0,
+    monthlyCommissions: 0,
+    conversionRate: 0,
+    approvedInvestments: 0,
+    totalInvestments: 0
   };
 
   const handleLogout = async () => {
     await signOut();
     navigate('/auth');
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -71,7 +132,7 @@ const PartnerDashboard = () => {
             Bem-vindo ao seu Dashboard
           </h2>
           <p className="text-gray-600">
-            Acompanhe suas indicações, comissões e desempenho como parceiro.
+            Gerencie seus investidores cadastrados e acompanhe suas comissões.
           </p>
         </div>
 
@@ -79,11 +140,11 @@ const PartnerDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Indicações</CardTitle>
+              <CardTitle className="text-sm font-medium">Total de Investidores</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalReferrals}</div>
+              <div className="text-2xl font-bold">{stats.totalInvestors}</div>
               <p className="text-xs text-muted-foreground">
                 {stats.activeInvestors} investidores ativos
               </p>
@@ -92,7 +153,7 @@ const PartnerDashboard = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Comissões Totais</CardTitle>
+              <CardTitle className="text-sm font-medium">Comissões Estimadas</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -109,9 +170,9 @@ const PartnerDashboard = () => {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.conversionRate}%</div>
+              <div className="text-2xl font-bold">{stats.conversionRate.toFixed(1)}%</div>
               <p className="text-xs text-muted-foreground">
-                {stats.clicks} cliques nos seus links
+                {stats.approvedInvestments} investimentos aprovados
               </p>
             </CardContent>
           </Card>
@@ -123,17 +184,26 @@ const PartnerDashboard = () => {
             <CardHeader>
               <CardTitle>Ações Rápidas</CardTitle>
               <CardDescription>
-                Acesse rapidamente as principais funcionalidades
+                Gerencie seus investidores e acompanhe o desempenho
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button 
-                onClick={() => navigate('/partner/links')}
+                onClick={() => navigate('/partner/investors/new')}
+                className="w-full justify-start"
+                variant="default"
+              >
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Cadastrar Novo Investidor
+              </Button>
+              
+              <Button 
+                onClick={() => navigate('/partner/investors')}
                 className="w-full justify-start"
                 variant="outline"
               >
-                <LinkIcon className="mr-2 h-4 w-4" />
-                Gerenciar Links de Indicação
+                <Eye className="mr-2 h-4 w-4" />
+                Ver Meus Investidores
               </Button>
               
               <Button 
@@ -168,6 +238,11 @@ const PartnerDashboard = () => {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Comissão:</span>
                 <span className="text-sm font-bold">5% inicial / 2,5% recorrente</span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Investidores:</span>
+                <span className="text-sm font-bold">{stats.totalInvestors} cadastrados</span>
               </div>
             </CardContent>
           </Card>
