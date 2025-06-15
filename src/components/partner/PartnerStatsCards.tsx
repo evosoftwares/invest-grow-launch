@@ -25,7 +25,7 @@ const PartnerStatsCards = ({ stats }: PartnerStatsCardsProps) => {
         <CardContent>
           <div className="text-2xl font-bold">{stats.totalInvestors}</div>
           <p className="text-xs text-muted-foreground">
-            {stats.activeInvestors} com investimentos
+            {stats.activeInvestors} com investimentos aprovados
           </p>
         </CardContent>
       </Card>
@@ -38,7 +38,7 @@ const PartnerStatsCards = ({ stats }: PartnerStatsCardsProps) => {
         <CardContent>
           <div className="text-2xl font-bold">R$ {stats.totalCommissions.toLocaleString('pt-BR')}</div>
           <p className="text-xs text-muted-foreground">
-            R$ {stats.paidCommissions.toLocaleString('pt-BR')} pagas
+            R$ {stats.paidCommissions.toLocaleString('pt-BR')} recebidas
           </p>
         </CardContent>
       </Card>

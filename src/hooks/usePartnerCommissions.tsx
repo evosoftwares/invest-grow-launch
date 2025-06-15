@@ -73,6 +73,18 @@ export const usePartnerCommissions = () => {
       }
 
       console.log('Partner commissions fetched:', data?.length);
+      
+      // CORREÇÃO: Validar datas das comissões
+      const now = new Date();
+      data?.forEach(commission => {
+        if (commission.paid_at) {
+          const paidDate = new Date(commission.paid_at);
+          if (paidDate > now) {
+            console.warn(`⚠️ INCONSISTENCY: Commission ${commission.id} has future paid_at date:`, commission.paid_at);
+          }
+        }
+      });
+      
       return data as PartnerCommission[];
     },
     enabled: !!userProfile,

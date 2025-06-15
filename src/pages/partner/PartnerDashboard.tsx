@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -19,26 +18,43 @@ const PartnerDashboardContent = () => {
   const { data: commissions = [], isLoading: isLoadingCommissions } = usePartnerCommissions();
   const { data: partnerStats, isLoading } = usePartnerStats(partnerId);
 
-  // Calcular comissões baseadas nos dados reais
+  // CORREÇÃO: Calcular comissões baseadas nos dados reais com validações
   const commissionStats = {
     totalCommissions: commissions.reduce((sum, comm) => sum + Number(comm.amount), 0),
     paidCommissions: commissions
-      .filter(comm => comm.paid_at)
+      .filter(comm => comm.paid_at && new Date(comm.paid_at) <= new Date())
       .reduce((sum, comm) => sum + Number(comm.amount), 0),
     pendingCommissions: commissions
-      .filter(comm => !comm.paid_at)
+      .filter(comm => !comm.paid_at || new Date(comm.paid_at) > new Date())
       .reduce((sum, comm) => sum + Number(comm.amount), 0),
+    // CORREÇÃO: Comissões mensais baseadas em paid_at, não calculated_at
     monthlyCommissions: commissions
       .filter(comm => {
-        const commDate = new Date(comm.calculated_at);
+        if (!comm.paid_at) return false;
+        const paidDate = new Date(comm.paid_at);
         const now = new Date();
-        return commDate.getMonth() === now.getMonth() && commDate.getFullYear() === now.getFullYear();
+        // Validar se a data não é futura
+        if (paidDate > now) {
+          console.warn(`⚠️ Skipping commission ${comm.id} with future paid_at date:`, comm.paid_at);
+          return false;
+        }
+        return paidDate.getMonth() === now.getMonth() && paidDate.getFullYear() === now.getFullYear();
       })
       .reduce((sum, comm) => sum + Number(comm.amount), 0)
   };
 
-  // Log das comissões para debugging
-  console.log('Commission stats:', commissionStats);
+  // Log das comissões para debugging com validações
+  console.log('=== COMMISSION STATS VALIDATION ===');
+  console.log('Total commissions found:', commissions.length);
+  console.log('Commission stats calculated:', commissionStats);
+  
+  // Validar se total = pago + pendente
+  const calculatedTotal = commissionStats.paidCommissions + commissionStats.pendingCommissions;
+  if (Math.abs(calculatedTotal - commissionStats.totalCommissions) > 0.01) {
+    console.warn('⚠️ INCONSISTENCY: Total commissions != Paid + Pending');
+    console.warn('Total:', commissionStats.totalCommissions);
+    console.warn('Paid + Pending:', calculatedTotal);
+  }
 
   const stats = partnerStats ? {
     ...partnerStats,
@@ -55,8 +71,20 @@ const PartnerDashboardContent = () => {
     monthlyCommissions: 0
   };
 
-  // Log das estatísticas finais
+  // Log das estatísticas finais com validação
+  console.log('=== FINAL DASHBOARD STATS ===');
   console.log('Final stats used in dashboard:', stats);
+  
+  // Validações finais
+  if (stats.activeInvestors > stats.totalInvestors) {
+    console.error('❌ CRITICAL: Active investors > Total investors!');
+  }
+  if (stats.conversionRate > 100) {
+    console.error('❌ CRITICAL: Conversion rate > 100%!');
+  }
+  if (stats.approvedInvestments < 0) {
+    console.error('❌ CRITICAL: Negative approved investments!');
+  }
 
   const handleLogout = async () => {
     await signOut();

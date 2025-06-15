@@ -29,39 +29,54 @@ export const usePartnerStats = (partnerId: string | null | undefined) => {
       // Calcular estatísticas corrigidas
       const totalInvestors = investors?.length || 0;
       
-      // Investidores ativos: aqueles que têm pelo menos um investimento
-      const investorIdsWithInvestments = new Set(investments?.map(inv => inv.investor_id) || []);
-      const activeInvestors = investorIdsWithInvestments.size;
-      
-      console.log('Investors with investments:', activeInvestors);
-      
-      // Total de investimentos
-      const totalInvestments = investments?.reduce((sum, inv) => sum + Number(inv.amount), 0) || 0;
-      
-      // Investimentos aprovados (status = 'approved' ou 'paid')
+      // CORREÇÃO: Investidores ativos são aqueles com investimentos APROVADOS/PAGOS
       const approvedInvestments = investments?.filter(inv => 
         inv.status === 'approved' || inv.status === 'paid'
-      ).length || 0;
+      ) || [];
       
-      // Taxa de conversão corrigida: investidores com investimentos / total de investidores
+      const investorIdsWithApprovedInvestments = new Set(
+        approvedInvestments.map(inv => inv.investor_id)
+      );
+      const activeInvestors = investorIdsWithApprovedInvestments.size;
+      
+      console.log('Investors with approved/paid investments:', activeInvestors);
+      console.log('Approved investments count:', approvedInvestments.length);
+      
+      // Total de investimentos (soma dos valores)
+      const totalInvestments = investments?.reduce((sum, inv) => sum + Number(inv.amount), 0) || 0;
+      
+      // CORREÇÃO: Taxa de conversão baseada em investidores com investimentos aprovados
       const conversionRate = totalInvestors > 0 ? (activeInvestors / totalInvestors) * 100 : 0;
       
-      console.log('Partner stats calculated:', {
-        totalInvestors,
-        activeInvestors,
-        totalInvestments,
-        approvedInvestments,
-        conversionRate
-      });
+      // Log de validação para detectar inconsistências
+      console.log('=== PARTNER STATS VALIDATION ===');
+      console.log('Total investors:', totalInvestors);
+      console.log('Active investors (with approved investments):', activeInvestors);
+      console.log('Total investment amount:', totalInvestments);
+      console.log('Approved investments count:', approvedInvestments.length);
+      console.log('Conversion rate:', conversionRate.toFixed(2) + '%');
       
-      return {
+      // Validar consistência
+      if (activeInvestors > totalInvestors) {
+        console.warn('⚠️ INCONSISTENCY: Active investors > Total investors!');
+      }
+      
+      if (conversionRate > 100) {
+        console.warn('⚠️ INCONSISTENCY: Conversion rate > 100%!');
+      }
+      
+      const stats = {
         totalInvestors,
         activeInvestors,
         totalInvestments,
-        approvedInvestments,
-        conversionRate
+        approvedInvestments: approvedInvestments.length,
+        conversionRate: Math.min(conversionRate, 100) // Cap at 100%
       };
+      
+      console.log('Final partner stats:', stats);
+      return stats;
     },
-    enabled: !!partnerId
+    enabled: !!partnerId,
+    refetchInterval: 30000, // Atualizar a cada 30 segundos
   });
 };
