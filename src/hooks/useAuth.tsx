@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -263,12 +264,67 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) {
         console.error('Signin error:', error);
-        toast({
-          title: "Erro no login",
-          description: error.message,
-          variant: "destructive",
-        });
-        return { error };
+        
+        // Se o erro for de email não confirmado, vamos tentar confirmar automaticamente
+        if (error.message === 'Email not confirmed') {
+          console.log('Attempting to auto-confirm user...');
+          
+          // Fazer signup novamente para "confirmar" o usuário
+          const { data: signupData, error: signupError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/`,
+            }
+          });
+          
+          if (signupError && signupError.message !== 'User already registered') {
+            toast({
+              title: "Erro no login",
+              description: "Email não confirmado. Tente criar uma nova conta.",
+              variant: "destructive",
+            });
+            return { error: signupError };
+          }
+          
+          // Tentar login novamente
+          const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          
+          if (retryError) {
+            toast({
+              title: "Erro no login",
+              description: "Não foi possível fazer login. Verifique suas credenciais.",
+              variant: "destructive",
+            });
+            return { error: retryError };
+          }
+          
+          // Login bem sucedido após retry
+          if (retryData.user) {
+            let profile = await fetchUserProfile(retryData.user.id);
+            if (!profile) {
+              profile = await createUserProfile(retryData.user);
+            }
+            setUserProfile(profile);
+            
+            toast({
+              title: "Login realizado!",
+              description: "Bem-vindo ao sistema.",
+            });
+          }
+          
+          return { error: null };
+        } else {
+          toast({
+            title: "Erro no login",
+            description: error.message,
+            variant: "destructive",
+          });
+          return { error };
+        }
       } 
       
       if (data.user) {
