@@ -18,30 +18,67 @@ const PartnerDashboardContent = () => {
   const { data: commissions = [], isLoading: isLoadingCommissions } = usePartnerCommissions();
   const { data: partnerStats, isLoading } = usePartnerStats(partnerId);
 
-  // CORREÇÃO: Calcular comissões baseadas nos dados reais com validações
+  // CORREÇÃO: Calcular comissões baseadas nos dados reais com validações rigorosas
   const commissionStats = {
     totalCommissions: commissions.reduce((sum, comm) => sum + Number(comm.amount), 0),
     paidCommissions: commissions
-      .filter(comm => comm.paid_at && new Date(comm.paid_at) <= new Date())
+      .filter(comm => {
+        if (!comm.paid_at) return false;
+        const paidDate = new Date(comm.paid_at);
+        const now = new Date();
+        // Garantir que a data não é futura
+        return paidDate <= now;
+      })
       .reduce((sum, comm) => sum + Number(comm.amount), 0),
     pendingCommissions: commissions
-      .filter(comm => !comm.paid_at || new Date(comm.paid_at) > new Date())
+      .filter(comm => !comm.paid_at)
       .reduce((sum, comm) => sum + Number(comm.amount), 0),
-    // CORREÇÃO: Comissões mensais baseadas em paid_at, não calculated_at
+    // CORREÇÃO: Comissões mensais baseadas APENAS em paid_at válido
     monthlyCommissions: commissions
       .filter(comm => {
         if (!comm.paid_at) return false;
         const paidDate = new Date(comm.paid_at);
         const now = new Date();
-        // Validar se a data não é futura
-        if (paidDate > now) {
-          console.warn(`⚠️ Skipping commission ${comm.id} with future paid_at date:`, comm.paid_at);
-          return false;
-        }
-        return paidDate.getMonth() === now.getMonth() && paidDate.getFullYear() === now.getFullYear();
+        // Verificar se é do mês atual e não é futuro
+        return paidDate <= now && 
+               paidDate.getMonth() === now.getMonth() && 
+               paidDate.getFullYear() === now.getFullYear();
       })
       .reduce((sum, comm) => sum + Number(comm.amount), 0)
   };
+
+  // CORREÇÃO: Log detalhado das comissões para debugging
+  console.log('=== COMMISSION STATS DETAILED VALIDATION ===');
+  console.log('💰 Total commissions found:', commissions.length);
+  console.log('💵 Total commission amount:', commissionStats.totalCommissions);
+  console.log('✅ Paid commissions amount:', commissionStats.paidCommissions);
+  console.log('⏳ Pending commissions amount:', commissionStats.pendingCommissions);
+  console.log('📅 Monthly commissions (current month):', commissionStats.monthlyCommissions);
+  
+  // Validar se a soma está correta
+  const calculatedTotal = commissionStats.paidCommissions + commissionStats.pendingCommissions;
+  if (Math.abs(calculatedTotal - commissionStats.totalCommissions) > 0.01) {
+    console.error('❌ COMMISSION CALCULATION ERROR: Total != Paid + Pending');
+    console.error('Total:', commissionStats.totalCommissions);
+    console.error('Paid + Pending:', calculatedTotal);
+    console.error('Difference:', Math.abs(calculatedTotal - commissionStats.totalCommissions));
+  } else {
+    console.log('✅ Commission calculations are consistent');
+  }
+
+  // Validar comissões individualmente
+  commissions.forEach(comm => {
+    if (comm.paid_at) {
+      const paidDate = new Date(comm.paid_at);
+      const now = new Date();
+      if (paidDate > now) {
+        console.error(`❌ CRITICAL: Commission ${comm.id} still has future paid_at:`, comm.paid_at);
+      }
+    }
+    if (Number(comm.amount) <= 0) {
+      console.warn(`⚠️ Commission ${comm.id} has zero or negative amount:`, comm.amount);
+    }
+  });
 
   // Log das comissões para debugging com validações
   console.log('=== COMMISSION STATS VALIDATION ===');

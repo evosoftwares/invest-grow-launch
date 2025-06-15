@@ -32,7 +32,7 @@ export const usePartnerCommissions = () => {
         throw new Error('User not authenticated');
       }
 
-      console.log('Fetching partner commissions for user:', userProfile.id);
+      console.log('🔍 Fetching partner commissions for user:', userProfile.id);
 
       // Primeiro, buscar o partner_id baseado no profile_id
       const { data: partnerData, error: partnerError } = await supabase
@@ -42,12 +42,12 @@ export const usePartnerCommissions = () => {
         .single();
 
       if (partnerError) {
-        console.error('Error fetching partner:', partnerError);
+        console.error('❌ Error fetching partner:', partnerError);
         throw partnerError;
       }
 
       if (!partnerData) {
-        console.log('No partner found for user');
+        console.log('⚠️ No partner found for user');
         return [];
       }
 
@@ -68,24 +68,29 @@ export const usePartnerCommissions = () => {
         .order('calculated_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching partner commissions:', error);
+        console.error('❌ Error fetching partner commissions:', error);
         throw error;
       }
 
-      console.log('Partner commissions fetched:', data?.length);
+      console.log('💰 Partner commissions fetched:', data?.length);
       
-      // CORREÇÃO: Validar datas das comissões
+      // CORREÇÃO: Validar e filtrar datas das comissões
       const now = new Date();
-      data?.forEach(commission => {
+      const validCommissions = data?.filter(commission => {
+        // Verificar se paid_at não é futuro (após correção no banco)
         if (commission.paid_at) {
           const paidDate = new Date(commission.paid_at);
           if (paidDate > now) {
-            console.warn(`⚠️ INCONSISTENCY: Commission ${commission.id} has future paid_at date:`, commission.paid_at);
+            console.warn(`⚠️ Found commission with future paid_at (should be fixed):`, commission.id);
+            return false; // Filtrar comissões com datas futuras
           }
         }
-      });
+        return true;
+      }) || [];
       
-      return data as PartnerCommission[];
+      console.log('✅ Valid commissions after filtering:', validCommissions.length);
+      
+      return validCommissions as PartnerCommission[];
     },
     enabled: !!userProfile,
     refetchInterval: 30000, // Atualizar a cada 30 segundos

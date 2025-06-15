@@ -8,15 +8,15 @@ export const usePartnerStats = (partnerId: string | null | undefined) => {
     queryFn: async () => {
       if (!partnerId) return null;
       
-      console.log('Fetching partner stats for partner:', partnerId);
+      console.log('🔍 Fetching partner stats for partner:', partnerId);
       
       // Buscar investidores do parceiro
       const { data: investors } = await supabase
         .from('investors')
-        .select('*')
+        .select('id, status, full_name')
         .eq('partner_id', partnerId);
       
-      console.log('Total investors found:', investors?.length);
+      console.log('📊 Total investors found:', investors?.length);
       
       // Buscar investimentos dos investidores do parceiro
       const { data: investments } = await supabase
@@ -24,45 +24,53 @@ export const usePartnerStats = (partnerId: string | null | undefined) => {
         .select('amount, status, investor_id')
         .eq('partner_id', partnerId);
       
-      console.log('Total investments found:', investments?.length);
+      console.log('💰 Total investments found:', investments?.length);
       
-      // Calcular estatísticas corrigidas
+      // CORREÇÃO: Calcular estatísticas corrigidas
       const totalInvestors = investors?.length || 0;
       
-      // CORREÇÃO: Investidores ativos são aqueles com investimentos APROVADOS/PAGOS
+      // CORREÇÃO: Investidores ativos são aqueles com STATUS 'invested'
+      const activeInvestors = investors?.filter(inv => inv.status === 'invested').length || 0;
+      
+      // Investimentos aprovados/pagos
       const approvedInvestments = investments?.filter(inv => 
         inv.status === 'approved' || inv.status === 'paid'
       ) || [];
       
-      const investorIdsWithApprovedInvestments = new Set(
-        approvedInvestments.map(inv => inv.investor_id)
-      );
-      const activeInvestors = investorIdsWithApprovedInvestments.size;
+      console.log('✅ Active investors (status=invested):', activeInvestors);
+      console.log('📈 Approved investments count:', approvedInvestments.length);
       
-      console.log('Investors with approved/paid investments:', activeInvestors);
-      console.log('Approved investments count:', approvedInvestments.length);
+      // Total de investimentos (soma dos valores aprovados/pagos apenas)
+      const totalInvestments = approvedInvestments.reduce((sum, inv) => sum + Number(inv.amount), 0);
       
-      // Total de investimentos (soma dos valores)
-      const totalInvestments = investments?.reduce((sum, inv) => sum + Number(inv.amount), 0) || 0;
-      
-      // CORREÇÃO: Taxa de conversão baseada em investidores com investimentos aprovados
+      // CORREÇÃO: Taxa de conversão baseada em investidores ativos vs total
       const conversionRate = totalInvestors > 0 ? (activeInvestors / totalInvestors) * 100 : 0;
       
-      // Log de validação para detectar inconsistências
+      // Validações de consistência
       console.log('=== PARTNER STATS VALIDATION ===');
-      console.log('Total investors:', totalInvestors);
-      console.log('Active investors (with approved investments):', activeInvestors);
-      console.log('Total investment amount:', totalInvestments);
-      console.log('Approved investments count:', approvedInvestments.length);
-      console.log('Conversion rate:', conversionRate.toFixed(2) + '%');
+      console.log('📋 Total investors:', totalInvestors);
+      console.log('🎯 Active investors (invested status):', activeInvestors);
+      console.log('💵 Total investment amount (approved/paid):', totalInvestments);
+      console.log('📊 Approved investments count:', approvedInvestments.length);
+      console.log('📈 Conversion rate:', conversionRate.toFixed(2) + '%');
       
-      // Validar consistência
+      // Verificar inconsistências
       if (activeInvestors > totalInvestors) {
-        console.warn('⚠️ INCONSISTENCY: Active investors > Total investors!');
+        console.error('❌ INCONSISTENCY: Active investors > Total investors!');
       }
       
       if (conversionRate > 100) {
-        console.warn('⚠️ INCONSISTENCY: Conversion rate > 100%!');
+        console.error('❌ INCONSISTENCY: Conversion rate > 100%!');
+      }
+      
+      // Verificar se há investidores com status inconsistente
+      const inconsistentInvestors = investors?.filter(investor => {
+        const hasApprovedInvestment = approvedInvestments.some(inv => inv.investor_id === investor.id);
+        return hasApprovedInvestment && investor.status !== 'invested';
+      }) || [];
+      
+      if (inconsistentInvestors.length > 0) {
+        console.warn('⚠️ INCONSISTENT INVESTORS:', inconsistentInvestors.map(i => i.full_name));
       }
       
       const stats = {
@@ -70,10 +78,10 @@ export const usePartnerStats = (partnerId: string | null | undefined) => {
         activeInvestors,
         totalInvestments,
         approvedInvestments: approvedInvestments.length,
-        conversionRate: Math.min(conversionRate, 100) // Cap at 100%
+        conversionRate: Math.min(Math.max(conversionRate, 0), 100) // Cap between 0-100%
       };
       
-      console.log('Final partner stats:', stats);
+      console.log('✅ Final partner stats:', stats);
       return stats;
     },
     enabled: !!partnerId,

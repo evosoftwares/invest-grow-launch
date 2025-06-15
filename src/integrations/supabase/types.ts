@@ -471,6 +471,14 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      validate_partner_data_consistency: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          issue_type: string
+          description: string
+          count: number
+        }[]
+      }
     }
     Enums: {
       commission_status: "pending" | "calculated" | "paid" | "cancelled"
