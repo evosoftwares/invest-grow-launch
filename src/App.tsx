@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ROICalculatorPage from "./pages/ROICalculatorPage";
+import HowItWorksPage from "./pages/HowItWorksPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import InvestorsManagement from "./pages/admin/InvestorsManagement";
 import PartnersManagement from "./pages/admin/PartnersManagement";
@@ -43,6 +44,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/calculadora" element={<ROICalculatorPage />} />
+              <Route path="/como-funciona" element={<HowItWorksPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route 
                 path="/admin/dashboard" 

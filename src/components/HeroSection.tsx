@@ -1,7 +1,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Users, TrendingUp } from "lucide-react";
+import { ArrowRight, Users, TrendingUp, Info } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface HeroSectionProps {
   onInvestClick: () => void;
@@ -9,6 +10,8 @@ interface HeroSectionProps {
 }
 
 export const HeroSection = ({ onInvestClick, onPartnerClick }: HeroSectionProps) => {
+  const navigate = useNavigate();
+
   return (
     <section className="pt-20 pb-32 px-4 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-[#B8FAFF]/20 to-blue-100/30 -z-10"></div>
@@ -32,7 +35,7 @@ export const HeroSection = ({ onInvestClick, onPartnerClick }: HeroSectionProps)
           Uma oportunidade única de investimento em uma empresa com potencial de crescimento exponencial.
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
           <Button 
             size="lg" 
             className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
@@ -51,6 +54,19 @@ export const HeroSection = ({ onInvestClick, onPartnerClick }: HeroSectionProps)
           >
             <Users className="mr-2 w-5 h-5" />
             Seja um Parceiro
+          </Button>
+        </div>
+        
+        <div className="mb-16">
+          <Button 
+            variant="ghost" 
+            size="lg" 
+            className="text-slate-600 hover:text-blue-600 hover:bg-blue-50 px-6 py-3"
+            onClick={() => navigate('/como-funciona')}
+          >
+            <Info className="mr-2 w-5 h-5" />
+            Como Funciona o Sistema
+            <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </div>
         
