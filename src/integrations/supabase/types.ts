@@ -170,6 +170,7 @@ export type Database = {
           paid_at: string | null
           partner_id: string | null
           payment_proof_url: string | null
+          status: string | null
           updated_at: string | null
         }
         Insert: {
@@ -186,6 +187,7 @@ export type Database = {
           paid_at?: string | null
           partner_id?: string | null
           payment_proof_url?: string | null
+          status?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -202,6 +204,7 @@ export type Database = {
           paid_at?: string | null
           partner_id?: string | null
           payment_proof_url?: string | null
+          status?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -233,11 +236,13 @@ export type Database = {
           income_range: string | null
           investment_experience: string | null
           last_contact_date: string | null
+          lead_source: string | null
           notes: string | null
           partner_id: string | null
           phone: string | null
           profession: string | null
           profile_id: string | null
+          status: string | null
           tags: string[] | null
           updated_at: string | null
         }
@@ -252,11 +257,13 @@ export type Database = {
           income_range?: string | null
           investment_experience?: string | null
           last_contact_date?: string | null
+          lead_source?: string | null
           notes?: string | null
           partner_id?: string | null
           phone?: string | null
           profession?: string | null
           profile_id?: string | null
+          status?: string | null
           tags?: string[] | null
           updated_at?: string | null
         }
@@ -271,11 +278,13 @@ export type Database = {
           income_range?: string | null
           investment_experience?: string | null
           last_contact_date?: string | null
+          lead_source?: string | null
           notes?: string | null
           partner_id?: string | null
           phone?: string | null
           profession?: string | null
           profile_id?: string | null
+          status?: string | null
           tags?: string[] | null
           updated_at?: string | null
         }
@@ -347,6 +356,7 @@ export type Database = {
           id: string
           profile_id: string
           specialty: string | null
+          status: string | null
           updated_at: string | null
         }
         Insert: {
@@ -361,6 +371,7 @@ export type Database = {
           id?: string
           profile_id: string
           specialty?: string | null
+          status?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -375,9 +386,18 @@ export type Database = {
           id?: string
           profile_id?: string
           specialty?: string | null
+          status?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "partners_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -450,14 +470,6 @@ export type Database = {
       is_admin: {
         Args: { _user_id: string }
         Returns: boolean
-      }
-      test_profile_creation: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          profiles_count: number
-          latest_profile_id: string
-          latest_profile_email: string
-        }[]
       }
     }
     Enums: {

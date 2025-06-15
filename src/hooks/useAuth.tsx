@@ -23,6 +23,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Função para criar perfil manualmente
+  const createUserProfile = async (user: User, userData?: any) => {
+    try {
+      console.log('Creating profile for user:', user.id);
+      
+      const profileData = {
+        id: user.id,
+        email: user.email || '',
+        full_name: userData?.full_name || user.email || '',
+        role: userData?.role || 'investor'
+      };
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert([profileData])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating profile:', error);
+        return null;
+      }
+
+      console.log('Profile created successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('Exception creating profile:', error);
+      return null;
+    }
+  };
+
   // Função para buscar perfil do usuário
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -50,7 +81,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const testProfileCreation = async () => {
     try {
       console.log('Testing profile creation...');
-      const { data, error } = await supabase.rpc('test_profile_creation');
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1);
       
       if (error) {
         console.error('Error testing profile creation:', error);
@@ -63,7 +98,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('Profile creation test result:', data);
         toast({
           title: "Teste de perfis",
-          description: `Encontrados ${data?.[0]?.profiles_count || 0} perfis no banco`,
+          description: `Encontrados ${data?.length || 0} perfis no banco`,
         });
       }
     } catch (error: any) {
@@ -145,7 +180,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           description: error.message,
           variant: "destructive",
         });
-      } else {
+      } else if (data.user) {
+        // Criar perfil manualmente após signup bem-sucedido
+        const profile = await createUserProfile(data.user, userData);
+        if (profile) {
+          setUserProfile(profile);
+        }
+        
         console.log('Signup successful');
         toast({
           title: "Cadastro realizado!",

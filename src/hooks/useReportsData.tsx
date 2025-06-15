@@ -148,10 +148,10 @@ export const useReportsData = (timeRange: string = '30days') => {
       // Calculate conversion funnel
       const totalLeads = allInvestors?.length || 0;
       const interestedCount = allInvestors?.filter(inv => 
-        ['qualified', 'interested'].includes(inv.status)
+        ['qualified', 'interested'].includes(inv.status || '')
       ).length || 0;
       const proposalsCount = investments?.filter(inv => 
-        ['analysis', 'approved'].includes(inv.status)
+        ['analysis', 'approved'].includes(inv.status || '')
       ).length || 0;
       const investorsCount = investments?.filter(inv => inv.status === 'paid').length || 0;
 
