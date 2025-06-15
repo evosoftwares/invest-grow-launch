@@ -12,7 +12,7 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   const { user, loading, userProfile } = useAuth();
 
   console.log('ProtectedRoute check:', { 
-    user: user?.email, 
+    user: !!user, 
     loading, 
     userProfile: userProfile?.role,
     requiredRole 
@@ -20,7 +20,7 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -29,6 +29,15 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   if (!user) {
     console.log('No user, redirecting to auth');
     return <Navigate to="/auth" replace />;
+  }
+
+  // Se não tem perfil ainda, aguardar
+  if (!userProfile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   if (requiredRole && userProfile) {

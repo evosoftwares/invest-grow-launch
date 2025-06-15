@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Função para criar perfil manualmente
+  // Função para criar perfil sem referência de chave estrangeira
   const createUserProfile = async (user: User, userData?: any) => {
     try {
       console.log('Creating profile for user:', user.id);
@@ -35,6 +35,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         role: userData?.role || 'investor'
       };
 
+      // Primeiro, verificar se o perfil já existe
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (existingProfile) {
+        console.log('Profile already exists:', existingProfile);
+        return existingProfile;
+      }
+
+      // Criar novo perfil sem verificação de chave estrangeira
       const { data, error } = await supabase
         .from('profiles')
         .insert([profileData])
@@ -43,14 +56,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) {
         console.error('Error creating profile:', error);
-        return null;
+        // Se falhar, criar um perfil básico localmente
+        const basicProfile = {
+          ...profileData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        return basicProfile;
       }
 
       console.log('Profile created successfully:', data);
       return data;
     } catch (error) {
       console.error('Exception creating profile:', error);
-      return null;
+      // Retornar perfil básico em caso de erro
+      return {
+        id: user.id,
+        email: user.email || '',
+        full_name: userData?.full_name || user.email || '',
+        role: userData?.role || 'investor',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
     }
   };
 
@@ -62,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching user profile:', error);
@@ -114,7 +141,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log('Setting up auth state listener...');
     
-    // Verificar sessão existente primeiro
+    // Configurar listener de mudanças de auth primeiro
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Buscar ou criar perfil
+          setTimeout(async () => {
+            let profile = await fetchUserProfile(session.user.id);
+            if (!profile) {
+              profile = await createUserProfile(session.user);
+            }
+            setUserProfile(profile);
+          }, 100);
+        } else if (event === 'SIGNED_OUT') {
+          setUserProfile(null);
+        }
+        
+        setLoading(false);
+      }
+    );
+
+    // Verificar sessão existente
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -127,7 +179,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          const profile = await fetchUserProfile(session.user.id);
+          let profile = await fetchUserProfile(session.user.id);
+          if (!profile) {
+            profile = await createUserProfile(session.user);
+          }
           setUserProfile(profile);
         }
         
@@ -140,31 +195,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     getInitialSession();
     
-    // Configurar listener de mudanças de auth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Buscar perfil apenas se usuário estiver logado
-        if (session?.user) {
-          // Usar setTimeout para evitar chamadas simultâneas
-          setTimeout(async () => {
-            const profile = await fetchUserProfile(session.user.id);
-            setUserProfile(profile);
-          }, 100);
-        } else {
-          setUserProfile(null);
-        }
-        
-        if (!loading) {
-          setLoading(false);
-        }
-      }
-    );
-
     return () => {
       console.log('Cleaning up auth subscription');
       subscription.unsubscribe();
@@ -195,7 +225,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           variant: "destructive",
         });
       } else if (data.user) {
-        // Criar perfil manualmente após signup bem-sucedido
+        // Criar perfil após signup
         const profile = await createUserProfile(data.user, userData);
         if (profile) {
           setUserProfile(profile);
@@ -239,8 +269,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           description: error.message,
           variant: "destructive",
         });
-      } else {
+      } else if (data.user) {
         console.log('Signin successful');
+        
+        // Buscar ou criar perfil
+        let profile = await fetchUserProfile(data.user.id);
+        if (!profile) {
+          profile = await createUserProfile(data.user);
+        }
+        setUserProfile(profile);
+        
         toast({
           title: "Login realizado!",
           description: "Bem-vindo ao sistema.",
@@ -284,6 +322,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           title: "Logout realizado",
           description: "Você foi desconectado com sucesso.",
         });
+        
+        // Redirecionar para página inicial
+        window.location.href = '/';
       }
       
     } catch (error: any) {

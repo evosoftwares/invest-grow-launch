@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,15 +21,7 @@ const Index = () => {
 
   // Redirecionar usuários autenticados para o sistema
   useEffect(() => {
-    console.log('Verificando redirecionamento:', { loading, user: !!user, userProfile });
-    
-    if (!loading && user) {
-      // Se não tem perfil ainda, aguardar um pouco
-      if (!userProfile) {
-        console.log('Usuário logado mas sem perfil, aguardando...');
-        return;
-      }
-      
+    if (!loading && user && userProfile) {
       console.log('Usuario logado detectado, redirecionando para o sistema:', userProfile.role);
       
       // Redirecionar baseado no papel do usuário
@@ -72,7 +65,7 @@ const Index = () => {
   // Mostrar loading apenas quando realmente carregando
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p>Carregando...</p>
@@ -84,7 +77,7 @@ const Index = () => {
   // Se usuário logado, não mostrar a landing page enquanto processa redirecionamento
   if (user && userProfile) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p>Redirecionando...</p>
