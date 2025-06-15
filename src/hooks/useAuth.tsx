@@ -36,6 +36,27 @@ const cleanupAuthState = () => {
   });
 };
 
+// Função para redirecionar baseado no role
+const redirectUserBasedOnRole = (userProfile: any) => {
+  if (!userProfile) return;
+  
+  const role = userProfile.role || 'investor';
+  console.log('Redirecting user with role:', role);
+  
+  switch (role) {
+    case 'admin':
+      window.location.href = '/admin/dashboard';
+      break;
+    case 'partner':
+      window.location.href = '/partner/dashboard';
+      break;
+    case 'investor':
+    default:
+      window.location.href = '/calculadora';
+      break;
+  }
+};
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -142,6 +163,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
             setUserProfile(profile);
             setLoading(false);
+            
+            // Redirecionar após carregar o perfil
+            if (window.location.pathname === '/auth') {
+              redirectUserBasedOnRole(profile);
+            }
           }, 100);
         } else if (event === 'SIGNED_OUT') {
           setUserProfile(null);
@@ -170,6 +196,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             profile = await createUserProfile(session.user);
           }
           setUserProfile(profile);
+          
+          // Redirecionar se estiver na página de auth
+          if (window.location.pathname === '/auth') {
+            redirectUserBasedOnRole(profile);
+          }
         }
         
         setLoading(false);
@@ -218,13 +249,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const profile = await createUserProfile(data.user, userData);
         if (profile) {
           setUserProfile(profile);
+          
+          // Redirecionar após signup bem-sucedido
+          toast({
+            title: "Cadastro realizado!",
+            description: "Conta criada com sucesso. Redirecionando...",
+          });
+          
+          setTimeout(() => {
+            redirectUserBasedOnRole(profile);
+          }, 1000);
         }
         
         console.log('Signup successful');
-        toast({
-          title: "Cadastro realizado!",
-          description: "Conta criada com sucesso. Você já pode usar o sistema.",
-        });
       }
 
       return { error };
@@ -312,8 +349,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             
             toast({
               title: "Login realizado!",
-              description: "Bem-vindo ao sistema.",
+              description: "Bem-vindo ao sistema. Redirecionando...",
             });
+            
+            // Redirecionar após login bem-sucedido
+            setTimeout(() => {
+              redirectUserBasedOnRole(profile);
+            }, 1000);
           }
           
           return { error: null };
@@ -339,11 +381,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         toast({
           title: "Login realizado!",
-          description: "Bem-vindo ao sistema.",
+          description: "Bem-vindo ao sistema. Redirecionando...",
         });
 
-        // Navigation será tratada pelo componente que chama signIn
+        // Redirecionar após login bem-sucedido
         console.log('User signed in with role:', profile?.role);
+        setTimeout(() => {
+          redirectUserBasedOnRole(profile);
+        }, 1000);
       }
 
       return { error };
@@ -383,6 +428,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         title: "Logout realizado",
         description: "Você foi desconectado com sucesso.",
       });
+      
+      // Redirecionar para página de login após logout
+      window.location.href = '/auth';
       
     } catch (error: any) {
       console.error('Signout exception:', error);
