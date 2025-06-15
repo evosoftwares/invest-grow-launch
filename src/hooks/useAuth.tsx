@@ -114,6 +114,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log('Setting up auth state listener...');
     
+    // Verificar sessão existente primeiro
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Error getting session:', error);
+        }
+        
+        console.log('Initial session:', session?.user?.email);
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          const profile = await fetchUserProfile(session.user.id);
+          setUserProfile(profile);
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error in getInitialSession:', error);
+        setLoading(false);
+      }
+    };
+
+    getInitialSession();
+    
     // Configurar listener de mudanças de auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -124,32 +150,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         // Buscar perfil apenas se usuário estiver logado
         if (session?.user) {
-          const profile = await fetchUserProfile(session.user.id);
-          setUserProfile(profile);
+          // Usar setTimeout para evitar chamadas simultâneas
+          setTimeout(async () => {
+            const profile = await fetchUserProfile(session.user.id);
+            setUserProfile(profile);
+          }, 100);
         } else {
           setUserProfile(null);
         }
         
-        setLoading(false);
+        if (!loading) {
+          setLoading(false);
+        }
       }
     );
-
-    // Verificar sessão existente
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error('Error getting session:', error);
-      }
-      
-      console.log('Initial session:', session?.user?.email);
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchUserProfile(session.user.id).then(setUserProfile);
-      }
-      
-      setLoading(false);
-    });
 
     return () => {
       console.log('Cleaning up auth subscription');
@@ -250,7 +264,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       console.log('Starting signout process');
-      setLoading(true);
       
       const { error } = await supabase.auth.signOut();
       
@@ -262,6 +275,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           variant: "destructive",
         });
       } else {
+        // Limpar estados locais
+        setUser(null);
+        setSession(null);
+        setUserProfile(null);
+        
         toast({
           title: "Logout realizado",
           description: "Você foi desconectado com sucesso.",
@@ -275,8 +293,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 

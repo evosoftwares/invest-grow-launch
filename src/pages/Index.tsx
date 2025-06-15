@@ -20,19 +20,31 @@ const Index = () => {
 
   // Redirecionar usuários autenticados para o sistema
   useEffect(() => {
-    if (!loading && user && userProfile) {
+    console.log('Verificando redirecionamento:', { loading, user: !!user, userProfile });
+    
+    if (!loading && user) {
+      // Se não tem perfil ainda, aguardar um pouco
+      if (!userProfile) {
+        console.log('Usuário logado mas sem perfil, aguardando...');
+        return;
+      }
+      
       console.log('Usuario logado detectado, redirecionando para o sistema:', userProfile.role);
       
       // Redirecionar baseado no papel do usuário
-      switch (userProfile.role) {
+      const role = userProfile.role || 'investor';
+      
+      switch (role) {
         case 'admin':
+          console.log('Redirecionando admin para dashboard');
           navigate('/admin/dashboard', { replace: true });
           break;
         case 'partner':
+          console.log('Redirecionando parceiro para dashboard');
           navigate('/partner/dashboard', { replace: true });
           break;
         default:
-          // Investidores vão para a calculadora por enquanto
+          console.log('Redirecionando investidor para calculadora');
           navigate('/calculadora', { replace: true });
           break;
       }
@@ -57,12 +69,25 @@ const Index = () => {
     };
   }, []);
 
+  // Mostrar loading apenas quando realmente carregando
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p>Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Se usuário logado, não mostrar a landing page enquanto processa redirecionamento
+  if (user && userProfile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Redirecionando...</p>
         </div>
       </div>
     );
@@ -105,6 +130,7 @@ const Index = () => {
       
       <FeaturesSection />
       
+      {/* Investment Opportunity Section */}
       <section id="oportunidade" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -171,6 +197,7 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Partner Section */}
       <section id="parceiros" className="py-20 px-4 bg-slate-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">

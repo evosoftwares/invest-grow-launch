@@ -1,10 +1,14 @@
 
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -17,6 +21,16 @@ export const Header = () => {
   const handleInvestClick = () => {
     const investEvent = new CustomEvent('openInvestmentForm');
     window.dispatchEvent(investEvent);
+    setIsMenuOpen(false);
+  };
+
+  const handleLoginClick = () => {
+    navigate('/auth');
+    setIsMenuOpen(false);
+  };
+
+  const handleLogoutClick = async () => {
+    await signOut();
     setIsMenuOpen(false);
   };
 
@@ -52,12 +66,30 @@ export const Header = () => {
             >
               Seja um Parceiro
             </button>
-            <Button 
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
-              onClick={handleInvestClick}
-            >
-              Investir Agora
-            </Button>
+            {!user ? (
+              <>
+                <Button 
+                  variant="outline"
+                  onClick={handleLoginClick}
+                >
+                  <LogIn className="mr-2 w-4 h-4" />
+                  Entrar
+                </Button>
+                <Button 
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+                  onClick={handleInvestClick}
+                >
+                  Investir Agora
+                </Button>
+              </>
+            ) : (
+              <Button 
+                variant="outline"
+                onClick={handleLogoutClick}
+              >
+                Sair
+              </Button>
+            )}
           </nav>
 
           <button
@@ -89,12 +121,32 @@ export const Header = () => {
               >
                 Seja um Parceiro
               </button>
-              <Button 
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white w-full"
-                onClick={handleInvestClick}
-              >
-                Investir Agora
-              </Button>
+              {!user ? (
+                <>
+                  <Button 
+                    variant="outline"
+                    onClick={handleLoginClick}
+                    className="w-full justify-start"
+                  >
+                    <LogIn className="mr-2 w-4 h-4" />
+                    Entrar
+                  </Button>
+                  <Button 
+                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white w-full"
+                    onClick={handleInvestClick}
+                  >
+                    Investir Agora
+                  </Button>
+                </>
+              ) : (
+                <Button 
+                  variant="outline"
+                  onClick={handleLogoutClick}
+                  className="w-full justify-start"
+                >
+                  Sair
+                </Button>
+              )}
             </nav>
           </div>
         )}
