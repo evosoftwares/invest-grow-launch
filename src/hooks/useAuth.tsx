@@ -205,63 +205,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  // Função para buscar perfil do usuário
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      console.log('Fetching user profile for:', userId);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        return null;
-      }
-
-      console.log('User profile fetched:', data);
-      return data;
-    } catch (error) {
-      console.error('Error in fetchUserProfile:', error);
-      return null;
-    }
-  };
-
-  // Função para testar a criação de perfis
-  const testProfileCreation = async () => {
-    try {
-      console.log('Testing profile creation...');
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1);
-      
-      if (error) {
-        console.error('Error testing profile creation:', error);
-        toast({
-          title: "Erro no teste",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        console.log('Profile creation test result:', data);
-        toast({
-          title: "Teste de perfis",
-          description: `Encontrados ${data?.length || 0} perfis no banco`,
-        });
-      }
-    } catch (error: any) {
-      console.error('Exception in testProfileCreation:', error);
-      toast({
-        title: "Erro no teste",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
   const signUp = async (email: string, password: string, userData?: any) => {
     try {
       console.log('Starting signup process for:', email);
