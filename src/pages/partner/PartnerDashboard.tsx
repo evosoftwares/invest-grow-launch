@@ -27,7 +27,7 @@ const PartnerDashboardContent = () => {
   const { data: partnerId, isLoading: isLoadingPartnerId, error: partnerError } = usePartnerId();
   const { data: commissions = [], isLoading: isLoadingCommissions } = usePartnerCommissions();
   
-  // Buscar estatísticas específicas do parceiro
+  // Buscar estatísticas específicas do parceiro com cálculos corrigidos
   const { data: partnerStats, isLoading } = useQuery({
     queryKey: ['partner-stats', partnerId],
     queryFn: async () => {
@@ -41,17 +41,34 @@ const PartnerDashboardContent = () => {
         .select('*')
         .eq('partner_id', partnerId);
       
+      console.log('Total investors found:', investors?.length);
+      
       // Buscar investimentos dos investidores do parceiro
       const { data: investments } = await supabase
         .from('investments')
-        .select('amount, status')
+        .select('amount, status, investor_id')
         .eq('partner_id', partnerId);
       
-      // Calcular estatísticas
+      console.log('Total investments found:', investments?.length);
+      
+      // Calcular estatísticas corrigidas
       const totalInvestors = investors?.length || 0;
-      const activeInvestors = investors?.filter(inv => inv.status === 'invested').length || 0;
+      
+      // Investidores ativos: aqueles que têm pelo menos um investimento
+      const investorIdsWithInvestments = new Set(investments?.map(inv => inv.investor_id) || []);
+      const activeInvestors = investorIdsWithInvestments.size;
+      
+      console.log('Investors with investments:', activeInvestors);
+      
+      // Total de investimentos
       const totalInvestments = investments?.reduce((sum, inv) => sum + Number(inv.amount), 0) || 0;
-      const approvedInvestments = investments?.filter(inv => inv.status === 'approved' || inv.status === 'paid').length || 0;
+      
+      // Investimentos aprovados (status = 'approved' ou 'paid')
+      const approvedInvestments = investments?.filter(inv => 
+        inv.status === 'approved' || inv.status === 'paid'
+      ).length || 0;
+      
+      // Taxa de conversão corrigida: investidores com investimentos / total de investidores
       const conversionRate = totalInvestors > 0 ? (activeInvestors / totalInvestors) * 100 : 0;
       
       console.log('Partner stats calculated:', {
@@ -91,6 +108,9 @@ const PartnerDashboardContent = () => {
       .reduce((sum, comm) => sum + Number(comm.amount), 0)
   };
 
+  // Log das comissões para debugging
+  console.log('Commission stats:', commissionStats);
+
   const stats = partnerStats ? {
     ...partnerStats,
     ...commissionStats
@@ -105,6 +125,9 @@ const PartnerDashboardContent = () => {
     pendingCommissions: 0,
     monthlyCommissions: 0
   };
+
+  // Log das estatísticas finais
+  console.log('Final stats used in dashboard:', stats);
 
   const handleLogout = async () => {
     await signOut();
@@ -199,7 +222,7 @@ const PartnerDashboardContent = () => {
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalInvestors}</div>
               <p className="text-xs text-muted-foreground">
-                {stats.activeInvestors} investidores ativos
+                {stats.activeInvestors} com investimentos
               </p>
             </CardContent>
           </Card>
