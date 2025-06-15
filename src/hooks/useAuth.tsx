@@ -161,12 +161,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               profile = await createUserProfile(session.user);
             }
             setUserProfile(profile);
+            setLoading(false);
           }, 100);
         } else if (event === 'SIGNED_OUT') {
           setUserProfile(null);
+          setLoading(false);
+        } else {
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
@@ -273,7 +275,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           description: error.message,
           variant: "destructive",
         });
-      } else if (data.user) {
+        return { error };
+      } 
+      
+      if (data.user) {
         console.log('Signin successful');
         
         // Buscar ou criar perfil
@@ -287,6 +292,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           title: "Login realizado!",
           description: "Bem-vindo ao sistema.",
         });
+
+        // Fazer redirecionamento direto baseado no role
+        const role = profile?.role || 'investor';
+        console.log('Redirecting user with role:', role);
+        
+        setTimeout(() => {
+          switch (role) {
+            case 'admin':
+              window.location.href = '/admin/dashboard';
+              break;
+            case 'partner':
+              window.location.href = '/partner/dashboard';
+              break;
+            default:
+              window.location.href = '/calculadora';
+              break;
+          }
+        }, 500);
       }
 
       return { error };

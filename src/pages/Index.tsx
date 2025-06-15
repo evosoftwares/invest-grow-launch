@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,31 +17,6 @@ const Index = () => {
   const [showPartnerForm, setShowPartnerForm] = useState(false);
   const navigate = useNavigate();
   const { user, userProfile, loading } = useAuth();
-
-  // Redirecionar usuários autenticados para o sistema
-  useEffect(() => {
-    if (!loading && user && userProfile) {
-      console.log('Usuario logado detectado, redirecionando para o sistema:', userProfile.role);
-      
-      // Redirecionar baseado no papel do usuário
-      const role = userProfile.role || 'investor';
-      
-      switch (role) {
-        case 'admin':
-          console.log('Redirecionando admin para dashboard');
-          navigate('/admin/dashboard', { replace: true });
-          break;
-        case 'partner':
-          console.log('Redirecionando parceiro para dashboard');
-          navigate('/partner/dashboard', { replace: true });
-          break;
-        default:
-          console.log('Redirecionando investidor para calculadora');
-          navigate('/calculadora', { replace: true });
-          break;
-      }
-    }
-  }, [user, userProfile, loading, navigate]);
 
   useEffect(() => {
     const handleOpenInvestmentForm = () => {
@@ -69,18 +43,6 @@ const Index = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p>Carregando...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Se usuário logado, não mostrar a landing page enquanto processa redirecionamento
-  if (user && userProfile) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Redirecionando...</p>
         </div>
       </div>
     );
