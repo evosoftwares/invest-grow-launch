@@ -6,74 +6,62 @@ import {
   DollarSign,
   ArrowLeft,
   Calendar,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { usePartnerCommissions } from "@/hooks/usePartnerCommissions";
 
 const PartnerCommissions = () => {
   const navigate = useNavigate();
   const { signOut, userProfile } = useAuth();
-  
-  // Mock data - em produção virá da API
-  const commissions = [
-    {
-      id: 1,
-      investor_name: "João Silva",
-      type: "inicial",
-      amount: 500.00,
-      investment_amount: 10000.00,
-      rate: 5,
-      date: "2024-01-15",
-      status: "pago"
-    },
-    {
-      id: 2,
-      investor_name: "Maria Santos",
-      type: "recorrente",
-      amount: 75.00,
-      investment_amount: 3000.00,
-      rate: 2.5,
-      date: "2024-01-20",
-      status: "pendente"
-    },
-    {
-      id: 3,
-      investor_name: "Carlos Oliveira",
-      type: "inicial",
-      amount: 250.00,
-      investment_amount: 5000.00,
-      rate: 5,
-      date: "2024-01-25",
-      status: "pago"
-    }
-  ];
-
-  const totalPaid = commissions.filter(c => c.status === 'pago').reduce((acc, c) => acc + c.amount, 0);
-  const totalPending = commissions.filter(c => c.status === 'pendente').reduce((acc, c) => acc + c.amount, 0);
+  const { data: commissions = [], isLoading, error } = usePartnerCommissions();
 
   const handleLogout = async () => {
     await signOut();
     navigate('/auth');
   };
 
-  const getStatusBadge = (status: string) => {
-    if (status === 'pago') {
+  // Calcular totais
+  const totalPaid = commissions
+    .filter(c => c.paid_at !== null)
+    .reduce((acc, c) => acc + Number(c.amount), 0);
+  
+  const totalPending = commissions
+    .filter(c => c.paid_at === null)
+    .reduce((acc, c) => acc + Number(c.amount), 0);
+
+  const getStatusBadge = (paidAt: string | null) => {
+    if (paidAt) {
       return <Badge className="bg-green-100 text-green-800">Pago</Badge>;
-    } else if (status === 'pendente') {
+    } else {
       return <Badge className="bg-yellow-100 text-yellow-800">Pendente</Badge>;
     }
-    return <Badge variant="outline">{status}</Badge>;
   };
 
-  const getTypeBadge = (type: string) => {
-    if (type === 'inicial') {
+  const getTypeBadge = (rate: number) => {
+    if (rate === 5.0) {
       return <Badge className="bg-blue-100 text-blue-800">Inicial</Badge>;
-    } else if (type === 'recorrente') {
+    } else {
       return <Badge className="bg-purple-100 text-purple-800">Recorrente</Badge>;
     }
-    return <Badge variant="outline">{type}</Badge>;
   };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center text-red-600">
+              <h3 className="text-lg font-semibold mb-2">Erro ao carregar comissões</h3>
+              <p className="text-sm">{error.message}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -134,7 +122,14 @@ const PartnerCommissions = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                R$ {totalPaid.toLocaleString('pt-BR')}
+                {isLoading ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  `R$ ${totalPaid.toLocaleString('pt-BR', { 
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2 
+                  })}`
+                )}
               </div>
             </CardContent>
           </Card>
@@ -146,7 +141,14 @@ const PartnerCommissions = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-yellow-600">
-                R$ {totalPending.toLocaleString('pt-BR')}
+                {isLoading ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  `R$ ${totalPending.toLocaleString('pt-BR', { 
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2 
+                  })}`
+                )}
               </div>
             </CardContent>
           </Card>
@@ -158,7 +160,14 @@ const PartnerCommissions = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">
-                R$ {(totalPaid + totalPending).toLocaleString('pt-BR')}
+                {isLoading ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  `R$ ${(totalPaid + totalPending).toLocaleString('pt-BR', { 
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2 
+                  })}`
+                )}
               </div>
             </CardContent>
           </Card>
@@ -173,36 +182,59 @@ const PartnerCommissions = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {commissions.map((commission) => (
-                <div key={commission.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold">{commission.investor_name}</h3>
-                      {getTypeBadge(commission.type)}
-                      {getStatusBadge(commission.status)}
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="w-8 h-8 animate-spin" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {commissions.map((commission) => (
+                  <div key={commission.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-semibold">
+                          {commission.investments?.investors?.full_name || 'Investidor'}
+                        </h3>
+                        {getTypeBadge(Number(commission.rate))}
+                        {getStatusBadge(commission.paid_at)}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <div>
+                          Investimento: R$ {Number(commission.investments?.amount || 0).toLocaleString('pt-BR', { 
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2 
+                          })}
+                        </div>
+                        <div>Taxa: {Number(commission.rate)}%</div>
+                        <div>
+                          Data: {new Date(commission.calculated_at).toLocaleDateString('pt-BR')}
+                        </div>
+                        {commission.paid_at && (
+                          <div>
+                            Pago em: {new Date(commission.paid_at).toLocaleDateString('pt-BR')}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-600">
-                      <div>Investimento: R$ {commission.investment_amount.toLocaleString('pt-BR')}</div>
-                      <div>Taxa: {commission.rate}%</div>
-                      <div>Data: {new Date(commission.date).toLocaleDateString('pt-BR')}</div>
+                    
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-green-600">
+                        R$ {Number(commission.amount).toLocaleString('pt-BR', { 
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2 
+                        })}
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-green-600">
-                      R$ {commission.amount.toLocaleString('pt-BR')}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
 
-            {commissions.length === 0 && (
-              <div className="text-center py-12 text-gray-500">
-                <DollarSign className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-semibold mb-2">Nenhuma comissão ainda</h3>
-                <p>Suas comissões aparecerão aqui assim que você fizer suas primeiras indicações.</p>
+                {commissions.length === 0 && !isLoading && (
+                  <div className="text-center py-12 text-gray-500">
+                    <DollarSign className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <h3 className="text-lg font-semibold mb-2">Nenhuma comissão ainda</h3>
+                    <p>Suas comissões aparecerão aqui assim que você fizer suas primeiras indicações.</p>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
