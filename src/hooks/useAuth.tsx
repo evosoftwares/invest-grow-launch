@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -223,7 +222,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('Signup successful');
         toast({
           title: "Cadastro realizado!",
-          description: "Conta criada com sucesso. Você pode fazer login agora.",
+          description: "Conta criada com sucesso. Você já pode usar o sistema.",
         });
       }
 
