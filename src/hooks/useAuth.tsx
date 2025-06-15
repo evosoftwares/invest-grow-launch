@@ -12,10 +12,29 @@ interface AuthContextType {
   signUp: (email: string, password: string, userData?: any) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
-  testProfileCreation: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Função para limpar completamente o estado de autenticação
+const cleanupAuthState = () => {
+  // Remove standard auth tokens
+  localStorage.removeItem('supabase.auth.token');
+  
+  // Remove all Supabase auth keys from localStorage
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      localStorage.removeItem(key);
+    }
+  });
+  
+  // Remove from sessionStorage if in use
+  Object.keys(sessionStorage || {}).forEach((key) => {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+      sessionStorage.removeItem(key);
+    }
+  });
+};
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -23,7 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Função para criar perfil sem referência de chave estrangeira
+  // Função para criar perfil do usuário
   const createUserProfile = async (user: User, userData?: any) => {
     try {
       console.log('Creating profile for user:', user.id);
@@ -37,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         phone: null
       };
 
-      // Primeiro, verificar se o perfil já existe
+      // Verificar se o perfil já existe
       const { data: existingProfile } = await supabase
         .from('profiles')
         .select('*')
@@ -49,7 +68,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return existingProfile;
       }
 
-      // Criar novo perfil sem verificação de chave estrangeira
+      // Criar novo perfil
       const { data, error } = await supabase
         .from('profiles')
         .insert([profileData])
@@ -58,20 +77,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) {
         console.error('Error creating profile:', error);
-        // Se falhar, criar um perfil básico localmente
-        const basicProfile = {
-          ...profileData,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        return basicProfile;
+        return profileData;
       }
 
       console.log('Profile created successfully:', data);
       return data;
     } catch (error) {
       console.error('Exception creating profile:', error);
-      // Retornar perfil básico em caso de erro
       return {
         id: user.id,
         email: user.email || '',
@@ -108,44 +120,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // Função para testar a criação de perfis
-  const testProfileCreation = async () => {
-    try {
-      console.log('Testing profile creation...');
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1);
-      
-      if (error) {
-        console.error('Error testing profile creation:', error);
-        toast({
-          title: "Erro no teste",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        console.log('Profile creation test result:', data);
-        toast({
-          title: "Teste de perfis",
-          description: `Encontrados ${data?.length || 0} perfis no banco`,
-        });
-      }
-    } catch (error: any) {
-      console.error('Exception in testProfileCreation:', error);
-      toast({
-        title: "Erro no teste",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
   useEffect(() => {
     console.log('Setting up auth state listener...');
     
-    // Configurar listener de mudanças de auth primeiro
+    // Configurar listener de mudanças de auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
@@ -154,7 +132,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (event === 'SIGNED_IN' && session?.user) {
-          // Buscar ou criar perfil
+          // Defer profile loading to prevent conflicts
           setTimeout(async () => {
             let profile = await fetchUserProfile(session.user.id);
             if (!profile) {
@@ -212,6 +190,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Starting signup process for:', email);
       setLoading(true);
       
+      // Limpar estado antes de tentar criar conta
+      cleanupAuthState();
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -240,7 +221,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('Signup successful');
         toast({
           title: "Cadastro realizado!",
-          description: "Verifique seu email para confirmar a conta.",
+          description: "Conta criada com sucesso. Você pode fazer login agora.",
         });
       }
 
@@ -262,6 +243,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       console.log('Starting signin process for:', email);
       setLoading(true);
+      
+      // Limpar estado antes de tentar fazer login
+      cleanupAuthState();
+      
+      // Tentar logout global primeiro
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        // Continue mesmo se falhar
+        console.log('Global signout failed, continuing...');
+      }
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -293,10 +285,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           description: "Bem-vindo ao sistema.",
         });
 
-        // Fazer redirecionamento direto baseado no role
+        // Redirecionamento baseado no role
         const role = profile?.role || 'investor';
         console.log('Redirecting user with role:', role);
         
+        // Usar setTimeout para garantir que o estado seja atualizado
         setTimeout(() => {
           switch (role) {
             case 'admin':
@@ -309,7 +302,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               window.location.href = '/calculadora';
               break;
           }
-        }, 500);
+        }, 1000);
       }
 
       return { error };
@@ -330,29 +323,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       console.log('Starting signout process');
       
-      const { error } = await supabase.auth.signOut();
+      // Limpar estado primeiro
+      cleanupAuthState();
       
-      if (error) {
-        console.error('Signout error:', error);
-        toast({
-          title: "Erro ao sair",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        // Limpar estados locais
-        setUser(null);
-        setSession(null);
-        setUserProfile(null);
-        
-        toast({
-          title: "Logout realizado",
-          description: "Você foi desconectado com sucesso.",
-        });
-        
-        // Redirecionar para página inicial
-        window.location.href = '/';
+      // Tentar logout global
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.log('Global signout failed, continuing...');
       }
+      
+      // Limpar estados locais
+      setUser(null);
+      setSession(null);
+      setUserProfile(null);
+      
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso.",
+      });
+      
+      // Redirecionar para página inicial com reload completo
+      window.location.href = '/';
       
     } catch (error: any) {
       console.error('Signout exception:', error);
@@ -372,7 +364,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signUp,
     signIn,
     signOut,
-    testProfileCreation,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

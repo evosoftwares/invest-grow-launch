@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,13 +11,11 @@ import { InvestmentForm } from "@/components/InvestmentForm";
 import { PartnerRegistration } from "@/components/PartnerRegistration";
 import { Footer } from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const [showInvestmentForm, setShowInvestmentForm] = useState(false);
   const [showPartnerForm, setShowPartnerForm] = useState(false);
   const navigate = useNavigate();
-  const { user, userProfile, loading } = useAuth();
 
   useEffect(() => {
     const handleOpenInvestmentForm = () => {
@@ -35,18 +34,6 @@ const Index = () => {
       window.removeEventListener('openPartnerForm', handleOpenPartnerForm);
     };
   }, []);
-
-  // Mostrar loading apenas quando realmente carregando
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Carregando...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
