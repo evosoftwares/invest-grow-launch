@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogIn } from "lucide-react";
+import { Menu, X, LogIn, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, userProfile, signOut } = useAuth();
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -31,6 +31,25 @@ export const Header = () => {
 
   const handleLogoutClick = async () => {
     await signOut();
+    setIsMenuOpen(false);
+  };
+
+  const handleDashboardClick = () => {
+    if (!userProfile) return;
+    
+    const role = userProfile.role || 'investor';
+    switch (role) {
+      case 'admin':
+        navigate('/admin/dashboard');
+        break;
+      case 'partner':
+        navigate('/partner/dashboard');
+        break;
+      case 'investor':
+      default:
+        navigate('/calculadora');
+        break;
+    }
     setIsMenuOpen(false);
   };
 
@@ -83,12 +102,21 @@ export const Header = () => {
                 </Button>
               </>
             ) : (
-              <Button 
-                variant="outline"
-                onClick={handleLogoutClick}
-              >
-                Sair
-              </Button>
+              <>
+                <Button 
+                  variant="outline"
+                  onClick={handleDashboardClick}
+                >
+                  <LayoutDashboard className="mr-2 w-4 h-4" />
+                  Meu Dashboard
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={handleLogoutClick}
+                >
+                  Sair
+                </Button>
+              </>
             )}
           </nav>
 
@@ -139,13 +167,23 @@ export const Header = () => {
                   </Button>
                 </>
               ) : (
-                <Button 
-                  variant="outline"
-                  onClick={handleLogoutClick}
-                  className="w-full justify-start"
-                >
-                  Sair
-                </Button>
+                <>
+                  <Button 
+                    variant="outline"
+                    onClick={handleDashboardClick}
+                    className="w-full justify-start"
+                  >
+                    <LayoutDashboard className="mr-2 w-4 h-4" />
+                    Meu Dashboard
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={handleLogoutClick}
+                    className="w-full justify-start"
+                  >
+                    Sair
+                  </Button>
+                </>
               )}
             </nav>
           </div>
