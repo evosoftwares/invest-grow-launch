@@ -17,13 +17,20 @@ export const ROIProjection = ({ data }: ROIProjectionProps) => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(value);
   };
 
   const calculateYearlyGrowth = (currentBalance: number, previousBalance: number) => {
     if (previousBalance === 0) return 0;
     return ((currentBalance - previousBalance) / previousBalance) * 100;
+  };
+
+  const calculateYearlyROI = (currentInterest: number, currentContributed: number) => {
+    if (currentContributed === 0) return 0;
+    return (currentInterest / currentContributed) * 100;
   };
 
   return (
@@ -46,13 +53,15 @@ export const ROIProjection = ({ data }: ROIProjectionProps) => {
                 <TableHead className="font-semibold">Total Investido</TableHead>
                 <TableHead className="font-semibold">Lucro Acumulado</TableHead>
                 <TableHead className="font-semibold">Saldo Total</TableHead>
+                <TableHead className="font-semibold">ROI (%)</TableHead>
                 <TableHead className="font-semibold">Crescimento</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {data.map((row, index) => {
-                const previousBalance = index > 0 ? data[index - 1].balance : 0;
+                const previousBalance = index > 0 ? data[index - 1].balance : row.balance;
                 const growth = calculateYearlyGrowth(row.balance, previousBalance);
+                const roi = calculateYearlyROI(row.interest, row.contributed);
                 
                 return (
                   <TableRow 
@@ -75,6 +84,13 @@ export const ROIProjection = ({ data }: ROIProjectionProps) => {
                     </TableCell>
                     <TableCell className="font-bold text-purple-600 text-lg">
                       {formatCurrency(row.balance)}
+                    </TableCell>
+                    <TableCell>
+                      {row.year > 0 && (
+                        <Badge className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
+                          {roi.toFixed(1)}%
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell>
                       {row.year > 0 && (
@@ -103,7 +119,7 @@ export const ROIProjection = ({ data }: ROIProjectionProps) => {
               <TrendingUp className="w-5 h-5 text-amber-600" />
               <h4 className="font-semibold text-amber-800">Resumo Final</h4>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
               <div>
                 <span className="text-amber-700">Valor Final:</span>
                 <p className="font-bold text-lg text-amber-800">
@@ -120,6 +136,12 @@ export const ROIProjection = ({ data }: ROIProjectionProps) => {
                 <span className="text-amber-700">Lucro Total:</span>
                 <p className="font-bold text-lg text-amber-800">
                   {formatCurrency(data[data.length - 1].interest)}
+                </p>
+              </div>
+              <div>
+                <span className="text-amber-700">ROI Total:</span>
+                <p className="font-bold text-lg text-amber-800">
+                  {calculateYearlyROI(data[data.length - 1].interest, data[data.length - 1].contributed).toFixed(1)}%
                 </p>
               </div>
             </div>

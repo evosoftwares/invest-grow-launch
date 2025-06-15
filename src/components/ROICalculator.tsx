@@ -42,25 +42,37 @@ export const ROICalculator = () => {
     const projectionData = [];
     let totalContributed = initialInvestment;
     
-    for (let month = 0; month <= totalMonths; month++) {
-      if (month > 0) {
-        balance = balance * (1 + monthlyRate) + monthlyContribution;
-        totalContributed += monthlyContribution;
-      }
+    // Add initial data point
+    projectionData.push({
+      year: 0,
+      balance: Math.round(balance),
+      contributed: Math.round(totalContributed),
+      interest: 0
+    });
+    
+    for (let month = 1; month <= totalMonths; month++) {
+      // Apply compound interest to current balance first
+      balance = balance * (1 + monthlyRate);
       
+      // Then add monthly contribution
+      balance = balance + monthlyContribution;
+      totalContributed += monthlyContribution;
+      
+      // Store yearly data points
       if (month % 12 === 0) {
+        const interest = balance - totalContributed;
         projectionData.push({
           year: month / 12,
           balance: Math.round(balance),
           contributed: Math.round(totalContributed),
-          interest: Math.round(balance - totalContributed)
+          interest: Math.round(interest)
         });
       }
     }
     
     const finalBalance = balance;
     const totalInterest = finalBalance - totalContributed;
-    const roi = ((finalBalance - totalContributed) / totalContributed) * 100;
+    const roi = (totalInterest / totalContributed) * 100;
     
     return {
       finalBalance,
@@ -72,6 +84,24 @@ export const ROICalculator = () => {
   };
 
   const onSubmit = (data: FormData) => {
+    // Validate input values
+    if (data.initialInvestment < 100) {
+      alert("O investimento inicial deve ser pelo menos R$ 100");
+      return;
+    }
+    if (data.monthlyContribution < 0) {
+      alert("O aporte mensal não pode ser negativo");
+      return;
+    }
+    if (data.annualReturn <= 0 || data.annualReturn > 50) {
+      alert("A taxa de retorno deve estar entre 0,1% e 50%");
+      return;
+    }
+    if (data.investmentPeriod < 1 || data.investmentPeriod > 50) {
+      alert("O período de investimento deve estar entre 1 e 50 anos");
+      return;
+    }
+
     const calculatedResults = calculateROI(data);
     setResults(calculatedResults);
     setShowResults(true);
@@ -80,7 +110,18 @@ export const ROICalculator = () => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
+  };
+
+  const formatCurrencyCompact = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(value);
   };
 
@@ -122,12 +163,25 @@ export const ROICalculator = () => {
                 <Input
                   id="initialInvestment"
                   type="number"
-                  {...register("initialInvestment", { required: true, min: 1000 })}
+                  min="100"
+                  max="10000000"
+                  step="100"
+                  {...register("initialInvestment", { 
+                    required: true, 
+                    min: 100, 
+                    max: 10000000,
+                    valueAsNumber: true 
+                  })}
                   className="text-lg font-semibold"
                 />
                 <p className="text-sm text-gray-500">
                   Valor atual: {formatCurrency(watchedValues.initialInvestment || 0)}
                 </p>
+                {errors.initialInvestment && (
+                  <p className="text-sm text-red-500">
+                    Valor deve estar entre R$ 100 e R$ 10.000.000
+                  </p>
+                )}
               </div>
 
               {/* Monthly Contribution */}
@@ -139,12 +193,25 @@ export const ROICalculator = () => {
                 <Input
                   id="monthlyContribution"
                   type="number"
-                  {...register("monthlyContribution", { required: true, min: 0 })}
+                  min="0"
+                  max="1000000"
+                  step="50"
+                  {...register("monthlyContribution", { 
+                    required: true, 
+                    min: 0, 
+                    max: 1000000,
+                    valueAsNumber: true 
+                  })}
                   className="text-lg font-semibold"
                 />
                 <p className="text-sm text-gray-500">
                   Valor atual: {formatCurrency(watchedValues.monthlyContribution || 0)}
                 </p>
+                {errors.monthlyContribution && (
+                  <p className="text-sm text-red-500">
+                    Valor deve estar entre R$ 0 e R$ 1.000.000
+                  </p>
+                )}
               </div>
 
               {/* Annual Return Slider */}
@@ -156,12 +223,12 @@ export const ROICalculator = () => {
                   value={[watchedValues.annualReturn]}
                   onValueChange={(value) => setValue("annualReturn", value[0])}
                   max={30}
-                  min={1}
-                  step={0.5}
+                  min={0.1}
+                  step={0.1}
                   className="w-full"
                 />
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>1%</span>
+                  <span>0,1%</span>
                   <span>15%</span>
                   <span>30%</span>
                 </div>
@@ -230,7 +297,7 @@ export const ROICalculator = () => {
                       </p>
                     </div>
                     <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                      <p className="text-sm text-gray-600">ROI</p>
+                      <p className="text-sm text-gray-600">ROI Total</p>
                       <Badge className="text-lg px-3 py-1 bg-gradient-to-r from-green-500 to-blue-500">
                         {results.roi.toFixed(1)}%
                       </Badge>

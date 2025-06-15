@@ -41,11 +41,25 @@ const chartConfig = {
 
 export const ROIChart = ({ data }: ROIChartProps) => {
   const formatCurrency = (value: number) => {
+    if (value >= 1000000) {
+      return `R$ ${(value / 1000000).toFixed(1)}M`;
+    } else if (value >= 1000) {
+      return `R$ ${(value / 1000).toFixed(0)}k`;
+    }
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
+    }).format(value);
+  };
+
+  const formatTooltipCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(value);
   };
 
@@ -103,7 +117,7 @@ export const ROIChart = ({ data }: ROIChartProps) => {
                   content={
                     <ChartTooltipContent
                       formatter={(value, name) => [
-                        formatCurrency(Number(value)),
+                        formatTooltipCurrency(Number(value)),
                         chartConfig[name as keyof typeof chartConfig]?.label || name
                       ]}
                       labelFormatter={(label) => `Ano ${label}`}
@@ -174,7 +188,7 @@ export const ROIChart = ({ data }: ROIChartProps) => {
                   content={
                     <ChartTooltipContent
                       formatter={(value, name) => [
-                        formatCurrency(Number(value)),
+                        formatTooltipCurrency(Number(value)),
                         chartConfig[name as keyof typeof chartConfig]?.label || name
                       ]}
                       labelFormatter={(label) => `Ano ${label}`}
