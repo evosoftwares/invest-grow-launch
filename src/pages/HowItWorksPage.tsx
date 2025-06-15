@@ -282,7 +282,7 @@ const HowItWorksPage = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
-                  className="bg-white text-gray-900 hover:bg-gray-100"
+                  className="bg-blue-600 text-white hover:bg-blue-700 border-0"
                   onClick={() => navigate('/')}
                 >
                   <TrendingUp className="mr-2 w-5 h-5" />
@@ -291,7 +291,7 @@ const HowItWorksPage = () => {
                 <Button 
                   size="lg" 
                   variant="outline"
-                  className="border-white text-white hover:bg-white/10"
+                  className="border-2 border-white text-white hover:bg-white hover:text-gray-900 bg-transparent"
                   onClick={() => navigate('/')}
                 >
                   <Users className="mr-2 w-5 h-5" />
