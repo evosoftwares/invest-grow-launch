@@ -9,18 +9,21 @@ import {
   UserPlus,
   Eye,
   PlusCircle,
-  ExternalLink
+  ExternalLink,
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { usePartnerId } from "@/hooks/usePartnerId";
+import PartnerErrorBoundary from "@/components/partner/PartnerErrorBoundary";
 
-const PartnerDashboard = () => {
+const PartnerDashboardContent = () => {
   const navigate = useNavigate();
   const { signOut, userProfile } = useAuth();
-  const { data: partnerId, isLoading: isLoadingPartnerId } = usePartnerId();
+  const { data: partnerId, isLoading: isLoadingPartnerId, error: partnerError } = usePartnerId();
   
   // Buscar estatísticas específicas do parceiro
   const { data: partnerStats, isLoading } = useQuery({
@@ -82,7 +85,34 @@ const PartnerDashboard = () => {
   if (isLoadingPartnerId || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (partnerError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Erro de Configuração</h2>
+          <p className="text-gray-600 mb-4">
+            Não foi possível carregar seus dados de parceiro. 
+            Sua conta pode ainda estar sendo configurada.
+          </p>
+          <div className="space-y-2">
+            <Button onClick={() => window.location.reload()}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Tentar Novamente
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/')}>
+              Voltar ao Início
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -204,6 +234,7 @@ const PartnerDashboard = () => {
                 onClick={() => navigate('/partner/links')}
                 className="w-full justify-start"
                 variant="outline"
+                disabled={!partnerId}
               >
                 <ExternalLink className="mr-2 h-4 w-4" />
                 Gerenciar Links de Indicação
@@ -230,7 +261,9 @@ const PartnerDashboard = () => {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Status:</span>
-                <Badge className="bg-green-100 text-green-800">Ativo</Badge>
+                <Badge className="bg-green-100 text-green-800">
+                  {partnerId ? 'Ativo' : 'Configurando'}
+                </Badge>
               </div>
               
               <div className="flex items-center justify-between">
@@ -252,6 +285,14 @@ const PartnerDashboard = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const PartnerDashboard = () => {
+  return (
+    <PartnerErrorBoundary>
+      <PartnerDashboardContent />
+    </PartnerErrorBoundary>
   );
 };
 

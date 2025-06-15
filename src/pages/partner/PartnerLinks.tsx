@@ -9,7 +9,8 @@ import {
   ExternalLink,
   ArrowLeft,
   Trash2,
-  AlertCircle
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,13 +18,13 @@ import { toast } from "@/components/ui/use-toast";
 import { usePartnerLinks, usePartnerLinkMutations } from "@/hooks/usePartnerLinks";
 import { usePartnerId } from "@/hooks/usePartnerId";
 import { CreateLinkModal } from "@/components/partner/CreateLinkModal";
+import PartnerErrorBoundary from "@/components/partner/PartnerErrorBoundary";
 
-const PartnerLinks = () => {
+const PartnerLinksContent = () => {
   const navigate = useNavigate();
   const { signOut, userProfile } = useAuth();
-  const { data: partnerId, isLoading: isLoadingPartnerId } = usePartnerId();
+  const { data: partnerId, isLoading: isLoadingPartnerId, error: partnerError } = usePartnerId();
   
-  // Buscar dados reais dos links
   const { data: links = [], isLoading, error } = usePartnerLinks();
   const { deletePartnerLink } = usePartnerLinkMutations();
 
@@ -57,18 +58,49 @@ const PartnerLinks = () => {
     );
   }
 
-  if (!partnerId) {
+  if (partnerError) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Erro de Configuração</h2>
           <p className="text-gray-600 mb-4">
-            Não foi possível encontrar seus dados de parceiro. Entre em contato com o suporte.
+            Não foi possível carregar seus dados de parceiro. 
+            Isso pode acontecer se sua conta ainda não foi configurada como parceiro.
           </p>
-          <Button onClick={() => navigate('/partner/dashboard')}>
-            Voltar ao Dashboard
-          </Button>
+          <div className="space-y-2">
+            <Button onClick={() => window.location.reload()}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Tentar Novamente
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/partner/dashboard')}>
+              Voltar ao Dashboard
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!partnerId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Conta em Configuração</h2>
+          <p className="text-gray-600 mb-4">
+            Sua conta de parceiro está sendo configurada. 
+            Tente novamente em alguns minutos ou entre em contato com o suporte.
+          </p>
+          <div className="space-y-2">
+            <Button onClick={() => window.location.reload()}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Verificar Novamente
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/partner/dashboard')}>
+              Voltar ao Dashboard
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -78,8 +110,10 @@ const PartnerLinks = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600">Erro ao carregar links: {error.message}</p>
-          <Button onClick={() => window.location.reload()} className="mt-4">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-600 mb-4">Erro ao carregar links: {error.message}</p>
+          <Button onClick={() => window.location.reload()}>
+            <RefreshCw className="w-4 h-4 mr-2" />
             Tentar Novamente
           </Button>
         </div>
@@ -234,6 +268,14 @@ const PartnerLinks = () => {
         )}
       </div>
     </div>
+  );
+};
+
+const PartnerLinks = () => {
+  return (
+    <PartnerErrorBoundary>
+      <PartnerLinksContent />
+    </PartnerErrorBoundary>
   );
 };
 

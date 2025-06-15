@@ -9,7 +9,15 @@ export const usePartnerId = () => {
   return useQuery({
     queryKey: ['partner-id', userProfile?.id],
     queryFn: async () => {
-      if (!userProfile?.id) return null;
+      if (!userProfile?.id) {
+        console.log('No user profile available');
+        return null;
+      }
+      
+      if (userProfile.role !== 'partner') {
+        console.log('User is not a partner');
+        return null;
+      }
       
       console.log('Fetching partner_id for profile:', userProfile.id);
       const { data, error } = await supabase
@@ -20,12 +28,14 @@ export const usePartnerId = () => {
 
       if (error) {
         console.error('Error fetching partner_id:', error);
-        return null;
+        throw new Error(`Failed to fetch partner data: ${error.message}`);
       }
 
       console.log('Partner_id found:', data?.id);
       return data?.id || null;
     },
     enabled: !!userProfile?.id && userProfile?.role === 'partner',
+    retry: 3,
+    retryDelay: 1000,
   });
 };

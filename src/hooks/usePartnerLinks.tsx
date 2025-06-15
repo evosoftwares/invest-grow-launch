@@ -30,12 +30,18 @@ const generateUniqueCode = () => {
 };
 
 export const usePartnerLinks = () => {
-  const { data: partnerId } = usePartnerId();
+  const { data: partnerId, error: partnerIdError } = usePartnerId();
   
   return useQuery({
     queryKey: ['partner-links', partnerId],
     queryFn: async () => {
-      if (!partnerId) return [];
+      if (!partnerId) {
+        if (partnerIdError) {
+          throw partnerIdError;
+        }
+        console.log('No partner ID available for fetching links');
+        return [];
+      }
       
       console.log('Fetching partner links for:', partnerId);
       const { data, error } = await supabase
@@ -46,13 +52,20 @@ export const usePartnerLinks = () => {
 
       if (error) {
         console.error('Error fetching partner links:', error);
-        throw error;
+        throw new Error(`Erro ao buscar links: ${error.message}`);
       }
 
       console.log('Partner links fetched:', data?.length);
       return data as PartnerLink[];
     },
     enabled: !!partnerId,
+    retry: (failureCount, error) => {
+      // Don't retry if it's a partner ID error
+      if (error.message.includes('Failed to fetch partner data')) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
 };
 
@@ -66,26 +79,33 @@ export const usePartnerLinkMutations = () => {
       description?: string;
     }) => {
       if (!partnerId) {
-        throw new Error('Partner ID não encontrado');
+        throw new Error('ID do parceiro não encontrado. Verifique se sua conta está configurada corretamente.');
       }
 
       // Gerar código único
       let code = generateUniqueCode();
       let isUnique = false;
+      let attempts = 0;
+      const maxAttempts = 10;
       
       // Verificar se o código já existe e gerar novo se necessário
-      while (!isUnique) {
+      while (!isUnique && attempts < maxAttempts) {
         const { data: existingLink } = await supabase
           .from('partner_links')
           .select('id')
           .eq('code', code)
-          .single();
+          .maybeSingle();
           
         if (!existingLink) {
           isUnique = true;
         } else {
           code = generateUniqueCode();
+          attempts++;
         }
+      }
+
+      if (attempts >= maxAttempts) {
+        throw new Error('Não foi possível gerar um código único. Tente novamente.');
       }
 
       const url = `https://futuropdv.com/ref/${code}`;
@@ -95,7 +115,7 @@ export const usePartnerLinkMutations = () => {
         .insert([{
           partner_id: partnerId,
           name: linkData.name,
-          description: linkData.description,
+          description: linkData.description || null,
           code: code,
           url: url,
           clicks: 0,
@@ -107,7 +127,11 @@ export const usePartnerLinkMutations = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating partner link:', error);
+        throw new Error(`Erro ao criar link: ${error.message}`);
+      }
+      
       return data;
     },
     onSuccess: () => {
@@ -145,7 +169,10 @@ export const usePartnerLinkMutations = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating partner link:', error);
+        throw new Error(`Erro ao atualizar link: ${error.message}`);
+      }
       return data;
     },
     onSuccess: () => {
@@ -172,7 +199,10 @@ export const usePartnerLinkMutations = () => {
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting partner link:', error);
+        throw new Error(`Erro ao remover link: ${error.message}`);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['partner-links'] });
