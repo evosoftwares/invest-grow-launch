@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,11 +10,34 @@ import { InvestmentForm } from "@/components/InvestmentForm";
 import { PartnerRegistration } from "@/components/PartnerRegistration";
 import { Footer } from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const [showInvestmentForm, setShowInvestmentForm] = useState(false);
   const [showPartnerForm, setShowPartnerForm] = useState(false);
   const navigate = useNavigate();
+  const { user, userProfile, loading } = useAuth();
+
+  // Redirecionar usuários autenticados para o sistema
+  useEffect(() => {
+    if (!loading && user && userProfile) {
+      console.log('Usuario logado detectado, redirecionando para o sistema:', userProfile.role);
+      
+      // Redirecionar baseado no papel do usuário
+      switch (userProfile.role) {
+        case 'admin':
+          navigate('/admin/dashboard', { replace: true });
+          break;
+        case 'partner':
+          navigate('/partner/dashboard', { replace: true });
+          break;
+        default:
+          // Investidores vão para a calculadora por enquanto
+          navigate('/calculadora', { replace: true });
+          break;
+      }
+    }
+  }, [user, userProfile, loading, navigate]);
 
   useEffect(() => {
     const handleOpenInvestmentForm = () => {
@@ -34,6 +56,17 @@ const Index = () => {
       window.removeEventListener('openPartnerForm', handleOpenPartnerForm);
     };
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -54,7 +87,7 @@ const Index = () => {
             Calcule seu Retorno de Investimento
           </h2>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-8">
-            Use nossa calculadora avanç da para simular diferentes cenários de investimento 
+            Use nossa calculadora avançada para simular diferentes cenários de investimento 
             e visualizar o potencial de crescimento do seu dinheiro.
           </p>
           
@@ -72,7 +105,6 @@ const Index = () => {
       
       <FeaturesSection />
       
-      {/* Investment Opportunity Section */}
       <section id="oportunidade" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -139,7 +171,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Partner Section */}
       <section id="parceiros" className="py-20 px-4 bg-slate-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -215,12 +246,10 @@ const Index = () => {
 
       <Footer />
 
-      {/* Investment Form Modal */}
       {showInvestmentForm && (
         <InvestmentForm onClose={() => setShowInvestmentForm(false)} />
       )}
 
-      {/* Partner Registration Modal */}
       {showPartnerForm && (
         <PartnerRegistration onClose={() => setShowPartnerForm(false)} />
       )}
