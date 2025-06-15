@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,37 +6,24 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Copy, 
   Eye, 
-  Plus, 
   ExternalLink,
-  ArrowLeft
+  ArrowLeft,
+  Trash2,
+  Edit
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/components/ui/use-toast";
+import { usePartnerLinks, usePartnerLinkMutations } from "@/hooks/usePartnerLinks";
+import { CreateLinkModal } from "@/components/partner/CreateLinkModal";
 
 const PartnerLinks = () => {
   const navigate = useNavigate();
   const { signOut, userProfile } = useAuth();
   
-  // Mock data - em produção virá da API
-  const [links] = useState([
-    {
-      id: 1,
-      name: "Link Principal",
-      url: "https://futuropdv.com/ref/ABC123",
-      clicks: 45,
-      conversions: 8,
-      created_at: "2024-01-15"
-    },
-    {
-      id: 2,
-      name: "Campanha Redes Sociais",
-      url: "https://futuropdv.com/ref/XYZ789",
-      clicks: 23,
-      conversions: 3,
-      created_at: "2024-01-20"
-    }
-  ]);
+  // Buscar dados reais dos links
+  const { data: links = [], isLoading, error } = usePartnerLinks(userProfile?.id);
+  const { deletePartnerLink } = usePartnerLinkMutations();
 
   const handleLogout = async () => {
     await signOut();
@@ -51,6 +37,36 @@ const PartnerLinks = () => {
       description: "O link foi copiado para a área de transferência.",
     });
   };
+
+  const handleDeleteLink = async (id: string, name: string) => {
+    if (window.confirm(`Tem certeza que deseja excluir o link "${name}"?`)) {
+      await deletePartnerLink.mutateAsync(id);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando links...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600">Erro ao carregar links: {error.message}</p>
+          <Button onClick={() => window.location.reload()} className="mt-4">
+            Tentar Novamente
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -103,10 +119,9 @@ const PartnerLinks = () => {
             </p>
           </div>
           
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Link
-          </Button>
+          {userProfile?.id && (
+            <CreateLinkModal partnerId={userProfile.id} />
+          )}
         </div>
 
         <div className="space-y-4">
@@ -117,6 +132,9 @@ const PartnerLinks = () => {
                   <div>
                     <CardTitle className="text-lg">{link.name}</CardTitle>
                     <CardDescription>
+                      {link.description && (
+                        <span className="block mb-1">{link.description}</span>
+                      )}
                       Criado em {new Date(link.created_at).toLocaleDateString('pt-BR')}
                     </CardDescription>
                   </div>
@@ -128,6 +146,9 @@ const PartnerLinks = () => {
                     <Badge className="bg-green-100 text-green-800">
                       {link.conversions} conversões
                     </Badge>
+                    {!link.is_active && (
+                      <Badge variant="destructive">Inativo</Badge>
+                    )}
                   </div>
                 </div>
               </CardHeader>
@@ -151,6 +172,13 @@ const PartnerLinks = () => {
                     onClick={() => window.open(link.url, '_blank')}
                   >
                     <ExternalLink className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDeleteLink(link.id, link.name)}
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
                 
@@ -183,10 +211,9 @@ const PartnerLinks = () => {
                 <h3 className="text-lg font-semibold mb-2">Nenhum link criado ainda</h3>
                 <p>Crie seu primeiro link de indicação para começar a ganhar comissões.</p>
               </div>
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Criar Primeiro Link
-              </Button>
+              {userProfile?.id && (
+                <CreateLinkModal partnerId={userProfile.id} />
+              )}
             </CardContent>
           </Card>
         )}
