@@ -49,46 +49,47 @@ const Wallet = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <div className="bg-white shadow-sm p-4">
+      <div className="bg-white/90 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/mobile/partner-dashboard')}
+            className="hover:bg-slate-100"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-slate-600" />
           </Button>
-          <h1 className="text-xl font-semibold">Carteira Digital</h1>
+          <h1 className="text-xl font-light text-slate-700">Carteira Digital</h1>
         </div>
       </div>
 
       <div className="p-4 space-y-6">
         {/* Saldo Cards */}
         <div className="grid grid-cols-1 gap-4">
-          <Card className="bg-gradient-to-r from-green-600 to-green-700 text-white">
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-100">Saldo Disponível</p>
-                  <h2 className="text-3xl font-bold">R$ 1.247,50</h2>
-                  <p className="text-green-100">Pronto para saque</p>
+                  <p className="text-blue-100">Saldo Disponível</p>
+                  <h2 className="text-3xl font-light">R$ 1.247,50</h2>
+                  <p className="text-blue-100">Pronto para saque</p>
                 </div>
-                <DollarSign className="h-12 w-12 text-green-200" />
+                <DollarSign className="h-12 w-12 text-blue-200" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white">
+          <Card className="bg-gradient-to-r from-blue-400 to-blue-500 text-white shadow-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-yellow-100">Saldo Pendente</p>
-                  <h2 className="text-3xl font-bold">R$ 180,00</h2>
-                  <p className="text-yellow-100">Em aprovação</p>
+                  <p className="text-blue-100">Saldo Pendente</p>
+                  <h2 className="text-3xl font-light">R$ 180,00</h2>
+                  <p className="text-blue-100">Em aprovação</p>
                 </div>
-                <Clock className="h-12 w-12 text-yellow-200" />
+                <Clock className="h-12 w-12 text-blue-200" />
               </div>
             </CardContent>
           </Card>
@@ -96,19 +97,19 @@ const Wallet = () => {
 
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-4">
-          <Button className="h-14 bg-blue-600 hover:bg-blue-700">
+          <Button className="h-14 bg-blue-500 hover:bg-blue-600 shadow-sm">
             <ArrowUpRight className="h-5 w-5 mr-2" />
             Transferir (PIX)
           </Button>
-          <Button variant="outline" className="h-14">
-            <TrendingUp className="h-5 w-5 mr-2" />
+          <Button variant="outline" className="h-14 border-slate-200 hover:bg-slate-50">
+            <TrendingUp className="h-5 w-5 mr-2 text-slate-600" />
             Extrato
           </Button>
         </div>
 
         {/* Clube de Vantagens Banner */}
         <Card 
-          className="bg-gradient-to-r from-purple-600 to-purple-700 text-white cursor-pointer"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white cursor-pointer shadow-sm"
           onClick={() => navigate('/mobile/rewards-club')}
         >
           <CardContent className="p-4">
@@ -116,14 +117,14 @@ const Wallet = () => {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Gift className="h-5 w-5" />
-                  <h3 className="font-semibold">Clube de Vantagens</h3>
+                  <h3 className="font-medium">Clube de Vantagens</h3>
                 </div>
-                <p className="text-purple-100">Nível Bronze - 85% para Prata</p>
-                <p className="text-sm text-purple-200">Desbloqueie benefícios exclusivos!</p>
+                <p className="text-blue-100">Nível Bronze - 85% para Prata</p>
+                <p className="text-sm text-blue-200">Desbloqueie benefícios exclusivos!</p>
               </div>
               <div className="text-center">
-                <Star className="h-8 w-8 text-yellow-300 mx-auto mb-1" />
-                <Badge className="bg-white text-purple-600 text-xs">
+                <Star className="h-8 w-8 text-blue-200 mx-auto mb-1" />
+                <Badge className="bg-white text-blue-600 text-xs">
                   Novo
                 </Badge>
               </div>
@@ -132,21 +133,21 @@ const Wallet = () => {
         </Card>
 
         {/* Transaction History */}
-        <Card>
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex items-center justify-between font-medium text-slate-700">
               Histórico de Transações
-              <Badge variant="secondary">{transactions.length}</Badge>
+              <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-blue-200">{transactions.length}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {transactions.map((transaction) => (
-              <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={transaction.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-full ${
                     transaction.type === 'credit' 
-                      ? 'bg-green-100 text-green-600' 
-                      : 'bg-red-100 text-red-600'
+                      ? 'bg-blue-50 text-blue-500' 
+                      : 'bg-slate-100 text-slate-500'
                   }`}>
                     {transaction.type === 'credit' ? 
                       <ArrowDownLeft className="h-4 w-4" /> : 
@@ -154,20 +155,20 @@ const Wallet = () => {
                     }
                   </div>
                   <div>
-                    <p className="font-medium">{transaction.description}</p>
-                    <p className="text-sm text-gray-600">{transaction.client}</p>
-                    <p className="text-xs text-gray-500">{transaction.date}</p>
+                    <p className="font-medium text-slate-700">{transaction.description}</p>
+                    <p className="text-sm text-slate-500">{transaction.client}</p>
+                    <p className="text-xs text-slate-400">{transaction.date}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={`font-semibold ${
-                    transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
+                  <p className={`font-medium ${
+                    transaction.type === 'credit' ? 'text-blue-600' : 'text-slate-600'
                   }`}>
                     {transaction.type === 'credit' ? '+' : ''}R$ {Math.abs(transaction.amount).toFixed(2)}
                   </p>
                   <Badge 
                     variant={transaction.status === 'completed' ? 'default' : 'secondary'}
-                    className="text-xs"
+                    className={transaction.status === 'completed' ? 'bg-blue-500' : 'bg-slate-200 text-slate-600'}
                   >
                     {transaction.status === 'completed' ? 'Pago' : 'Pendente'}
                   </Badge>

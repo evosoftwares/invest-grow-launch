@@ -82,40 +82,42 @@ const FeedOpportunities = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <div className="bg-white shadow-sm p-4">
+      <div className="bg-white/90 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate('/mobile/partner-dashboard')}
+              className="hover:bg-slate-100"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-5 w-5 text-slate-600" />
             </Button>
-            <h1 className="text-xl font-semibold">Oportunidades</h1>
+            <h1 className="text-xl font-light text-slate-700">Oportunidades</h1>
           </div>
           <Button
             variant="outline"
             size="icon"
             onClick={() => setShowFilters(!showFilters)}
+            className="border-slate-200 hover:bg-slate-50"
           >
-            <Filter className="h-5 w-5" />
+            <Filter className="h-5 w-5 text-slate-600" />
           </Button>
         </div>
       </div>
 
       {/* Filters */}
       {showFilters && (
-        <div className="bg-white border-b p-4 space-y-4">
-          <Input placeholder="Buscar por região..." />
+        <div className="bg-white/90 backdrop-blur-sm border-b border-slate-200 p-4 space-y-4">
+          <Input placeholder="Buscar por região..." className="border-slate-200 focus:border-blue-300" />
           <div className="flex gap-2 flex-wrap">
-            <Badge variant="secondary">Todas</Badge>
-            <Badge variant="outline">Entrega</Badge>
-            <Badge variant="outline">Transporte</Badge>
-            <Badge variant="outline">Manutenção</Badge>
-            <Badge variant="outline">Clientes Favoritos</Badge>
+            <Badge className="bg-blue-500 text-white">Todas</Badge>
+            <Badge variant="outline" className="border-slate-300 hover:bg-slate-50">Entrega</Badge>
+            <Badge variant="outline" className="border-slate-300 hover:bg-slate-50">Transporte</Badge>
+            <Badge variant="outline" className="border-slate-300 hover:bg-slate-50">Manutenção</Badge>
+            <Badge variant="outline" className="border-slate-300 hover:bg-slate-50">Clientes Favoritos</Badge>
           </div>
         </div>
       )}
@@ -123,22 +125,22 @@ const FeedOpportunities = () => {
       <div className="p-4 space-y-4">
         {/* Stats Header */}
         <div className="grid grid-cols-3 gap-4">
-          <Card>
+          <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
             <CardContent className="p-3 text-center">
-              <p className="text-lg font-bold text-blue-600">{missions.length}</p>
-              <p className="text-xs text-gray-600">Disponíveis</p>
+              <p className="text-lg font-light text-blue-500">{missions.length}</p>
+              <p className="text-xs text-slate-500">Disponíveis</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
             <CardContent className="p-3 text-center">
-              <p className="text-lg font-bold text-green-600">2</p>
-              <p className="text-xs text-gray-600">Urgentes</p>
+              <p className="text-lg font-light text-blue-500">2</p>
+              <p className="text-xs text-slate-500">Urgentes</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
             <CardContent className="p-3 text-center">
-              <p className="text-lg font-bold text-purple-600">2</p>
-              <p className="text-xs text-gray-600">Favoritos</p>
+              <p className="text-lg font-light text-blue-500">2</p>
+              <p className="text-xs text-slate-500">Favoritos</p>
             </CardContent>
           </Card>
         </div>
@@ -148,8 +150,8 @@ const FeedOpportunities = () => {
           {missions.map((mission) => (
             <Card 
               key={mission.id} 
-              className={`cursor-pointer transition-all ${
-                mission.urgent ? 'border-2 border-red-200 bg-red-50' : ''
+              className={`cursor-pointer transition-all border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md ${
+                mission.urgent ? 'border-l-4 border-l-blue-500 bg-blue-50/50' : ''
               }`}
               onClick={() => navigate(`/mobile/mission-details/${mission.id}`)}
             >
@@ -160,36 +162,36 @@ const FeedOpportunities = () => {
                       {getCategoryIcon(mission.category)}
                     </Badge>
                     {mission.urgent && (
-                      <Badge className="bg-red-100 text-red-800">Urgente</Badge>
+                      <Badge className="bg-blue-500 text-white">Urgente</Badge>
                     )}
                     {mission.favorite && (
-                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                      <Star className="h-4 w-4 text-blue-400 fill-current" />
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-green-600">
+                    <p className="text-lg font-light text-blue-600">
                       R$ {mission.value.toFixed(2)}
                     </p>
                   </div>
                 </div>
 
-                <h3 className="font-semibold text-lg mb-2">{mission.title}</h3>
+                <h3 className="font-medium text-lg mb-2 text-slate-700">{mission.title}</h3>
                 
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-medium">{mission.client}</span>
+                  <span className="text-sm font-medium text-slate-600">{mission.client}</span>
                   <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                    <span className="text-xs">{mission.rating}</span>
+                    <Star className="h-3 w-3 text-blue-400 fill-current" />
+                    <span className="text-xs text-slate-500">{mission.rating}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-gray-600 mb-3">
+                <div className="flex items-center gap-2 text-slate-500 mb-3">
                   <MapPin className="h-4 w-4" />
                   <span className="text-sm flex-1">{mission.address}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-4 text-sm text-slate-500">
                     <div className="flex items-center gap-1">
                       <MapPin className="h-4 w-4" />
                       <span>{mission.distance}</span>
@@ -199,7 +201,7 @@ const FeedOpportunities = () => {
                       <span>{mission.time}</span>
                     </div>
                   </div>
-                  <Button size="sm">
+                  <Button size="sm" className="bg-blue-500 hover:bg-blue-600">
                     Ver Detalhes
                   </Button>
                 </div>
@@ -209,7 +211,7 @@ const FeedOpportunities = () => {
         </div>
 
         {/* Load More Button */}
-        <Button variant="outline" className="w-full">
+        <Button variant="outline" className="w-full border-slate-200 hover:bg-slate-50">
           Carregar Mais Oportunidades
         </Button>
       </div>

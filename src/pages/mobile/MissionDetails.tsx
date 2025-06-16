@@ -58,67 +58,68 @@ const MissionDetails = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <div className="bg-white shadow-sm p-4">
+      <div className="bg-white/90 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/mobile/feed-opportunities')}
+            className="hover:bg-slate-100"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-slate-600" />
           </Button>
-          <h1 className="text-xl font-semibold">Detalhes da Missão</h1>
+          <h1 className="text-xl font-light text-slate-700">Detalhes da Missão</h1>
         </div>
       </div>
 
       <div className="p-4 space-y-4">
         {/* Mission Header */}
-        <Card>
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <Badge className="bg-blue-100 text-blue-800 mb-2">
+                <Badge className="bg-blue-50 text-blue-700 border-blue-200 mb-2">
                   <Package className="h-4 w-4 mr-1" />
                   Entrega
                 </Badge>
-                <h2 className="text-xl font-semibold">{mission.title}</h2>
+                <h2 className="text-xl font-medium text-slate-700">{mission.title}</h2>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-2xl font-light text-blue-600">
                   R$ {mission.value.toFixed(2)}
                 </p>
                 <div className="flex items-center gap-1 justify-end">
-                  <Clock className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">{mission.estimatedTime}</span>
+                  <Clock className="h-4 w-4 text-slate-400" />
+                  <span className="text-sm text-slate-500">{mission.estimatedTime}</span>
                 </div>
               </div>
             </div>
 
-            <p className="text-gray-700 mb-4">{mission.description}</p>
+            <p className="text-slate-600 mb-4">{mission.description}</p>
 
             <div className="flex items-center gap-2 mb-3">
-              <User className="h-4 w-4 text-gray-500" />
-              <span className="font-medium">{mission.client}</span>
+              <User className="h-4 w-4 text-slate-400" />
+              <span className="font-medium text-slate-700">{mission.client}</span>
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                <span className="text-sm">{mission.rating}</span>
+                <Star className="h-4 w-4 text-blue-400 fill-current" />
+                <span className="text-sm text-slate-500">{mission.rating}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-gray-500" />
-              <span className="text-gray-700">{mission.address}</span>
+              <MapPin className="h-4 w-4 text-slate-400" />
+              <span className="text-slate-600">{mission.address}</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Equipment Required */}
-        <Card>
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 font-medium text-slate-700">
+              <Package className="h-5 w-5 text-blue-500" />
               Equipamento Necessário
             </CardTitle>
           </CardHeader>
@@ -126,8 +127,8 @@ const MissionDetails = () => {
             <div className="space-y-2">
               {mission.equipment.map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-sm">{item}</span>
+                  <CheckCircle className="h-4 w-4 text-blue-500" />
+                  <span className="text-sm text-slate-600">{item}</span>
                 </div>
               ))}
             </div>
@@ -135,32 +136,32 @@ const MissionDetails = () => {
         </Card>
 
         {/* Contact Info */}
-        <Card>
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Phone className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 font-medium text-slate-700">
+              <Phone className="h-5 w-5 text-blue-500" />
               Contato no Local
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-gray-500" />
-                <span>{mission.contact.name}</span>
+                <User className="h-4 w-4 text-slate-400" />
+                <span className="text-slate-600">{mission.contact.name}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-gray-500" />
-                <span>{mission.contact.phone}</span>
+                <Phone className="h-4 w-4 text-slate-400" />
+                <span className="text-slate-600">{mission.contact.phone}</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Requirements */}
-        <Card>
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 font-medium text-slate-700">
+              <AlertTriangle className="h-5 w-5 text-blue-500" />
               Requisitos Importantes
             </CardTitle>
           </CardHeader>
@@ -168,8 +169,8 @@ const MissionDetails = () => {
             <div className="space-y-2">
               {mission.requirements.map((req, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm">{req}</span>
+                  <AlertTriangle className="h-4 w-4 text-blue-400" />
+                  <span className="text-sm text-slate-600">{req}</span>
                 </div>
               ))}
             </div>
@@ -179,7 +180,7 @@ const MissionDetails = () => {
         {/* Accept Button */}
         <Button
           onClick={handleAcceptMission}
-          className="w-full h-14 text-lg bg-green-600 hover:bg-green-700"
+          className="w-full h-14 text-lg bg-blue-500 hover:bg-blue-600 shadow-sm"
         >
           <CheckCircle className="h-6 w-6 mr-2" />
           ACEITAR MISSÃO
@@ -188,26 +189,26 @@ const MissionDetails = () => {
 
       {/* Confirmation Modal */}
       {showConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-sm">
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-sm border-slate-200 bg-white/95 backdrop-blur-sm shadow-lg">
             <CardHeader>
-              <CardTitle className="text-center">Confirmar Aceitação</CardTitle>
+              <CardTitle className="text-center font-medium text-slate-700">Confirmar Aceitação</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-center text-gray-600">
+              <p className="text-center text-slate-600">
                 Você está prestes a aceitar a missão "{mission.title}". 
                 Ao confirmar, você se compromete a executá-la conforme descrito.
               </p>
               <div className="flex gap-3">
                 <Button
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 border-slate-200 hover:bg-slate-50"
                   onClick={() => setShowConfirmation(false)}
                 >
                   Cancelar
                 </Button>
                 <Button
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  className="flex-1 bg-blue-500 hover:bg-blue-600"
                   onClick={confirmAcceptance}
                 >
                   Confirmar

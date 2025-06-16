@@ -25,9 +25,9 @@ const PartnerProfile = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'verified': return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'pending': return <AlertCircle className="h-5 w-5 text-yellow-500" />;
-      default: return <Clock className="h-5 w-5 text-gray-400" />;
+      case 'verified': return <CheckCircle className="h-5 w-5 text-blue-500" />;
+      case 'pending': return <AlertCircle className="h-5 w-5 text-blue-400" />;
+      default: return <Clock className="h-5 w-5 text-slate-400" />;
     }
   };
 
@@ -41,42 +41,43 @@ const PartnerProfile = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'verified': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'verified': return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'pending': return 'bg-blue-50 text-blue-600 border-blue-200';
+      default: return 'bg-slate-50 text-slate-600 border-slate-200';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <div className="bg-white shadow-sm p-4">
+      <div className="bg-white/90 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/mobile/login')}
+            className="hover:bg-slate-100"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-slate-600" />
           </Button>
-          <h1 className="text-xl font-semibold">Perfil e Serviços</h1>
+          <h1 className="text-xl font-light text-slate-700">Perfil e Serviços</h1>
         </div>
       </div>
 
       <div className="p-4 space-y-6">
         {/* Profile Summary */}
-        <Card>
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-xl font-bold text-blue-600">JD</span>
+                <span className="text-xl font-light text-blue-600">JD</span>
               </div>
               <div>
-                <h2 className="font-semibold">João da Silva</h2>
-                <p className="text-gray-600">Parceiro desde 2024</p>
+                <h2 className="font-medium text-slate-700">João da Silva</h2>
+                <p className="text-slate-500">Parceiro desde 2024</p>
                 <div className="flex items-center gap-1 mt-1">
-                  <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                  <span className="text-sm">4.8 (234 avaliações)</span>
+                  <Star className="h-4 w-4 text-blue-400 fill-current" />
+                  <span className="text-sm text-slate-600">4.8 (234 avaliações)</span>
                 </div>
               </div>
             </div>
@@ -84,11 +85,11 @@ const PartnerProfile = () => {
         </Card>
 
         {/* Meus Serviços */}
-        <Card>
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex items-center justify-between font-medium text-slate-700">
               Meus Serviços
-              <Badge variant="secondary">5 categorias</Badge>
+              <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-blue-200">5 categorias</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -99,8 +100,8 @@ const PartnerProfile = () => {
               cleaning: 'Limpeza',
               security: 'Segurança'
             }).map(([key, label]) => (
-              <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="font-medium">{label}</span>
+              <div key={key} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
+                <span className="font-medium text-slate-700">{label}</span>
                 <Switch
                   checked={services[key as keyof typeof services]}
                   onCheckedChange={(checked) => 
@@ -113,18 +114,18 @@ const PartnerProfile = () => {
         </Card>
 
         {/* Status dos Documentos */}
-        <Card>
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
-            <CardTitle>Documentos</CardTitle>
+            <CardTitle className="font-medium text-slate-700">Documentos</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {documents.map((doc, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+              <div key={index} className="flex items-center justify-between p-3 border border-slate-100 rounded-lg bg-white">
                 <div className="flex items-center gap-3">
                   {getStatusIcon(doc.status)}
                   <div>
-                    <div className="font-medium">{doc.name}</div>
-                    <div className="text-sm text-gray-600">{doc.message}</div>
+                    <div className="font-medium text-slate-700">{doc.name}</div>
+                    <div className="text-sm text-slate-500">{doc.message}</div>
                   </div>
                 </div>
                 <Badge className={getStatusColor(doc.status)}>
@@ -133,31 +134,31 @@ const PartnerProfile = () => {
               </div>
             ))}
             
-            <Button variant="outline" className="w-full mt-4">
-              <Upload className="h-4 w-4 mr-2" />
+            <Button variant="outline" className="w-full mt-4 border-slate-200 hover:bg-slate-50">
+              <Upload className="h-4 w-4 mr-2 text-slate-600" />
               Enviar Documentos
             </Button>
           </CardContent>
         </Card>
 
         {/* Reputação Segmentada */}
-        <Card>
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
-            <CardTitle>Reputação por Serviço</CardTitle>
+            <CardTitle className="font-medium text-slate-700">Reputação por Serviço</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between items-center">
-              <span>Entrega/Delivery</span>
+              <span className="text-slate-600">Entrega/Delivery</span>
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                <span className="font-semibold">4.9</span>
+                <Star className="h-4 w-4 text-blue-400 fill-current" />
+                <span className="font-medium text-slate-700">4.9</span>
               </div>
             </div>
             <div className="flex justify-between items-center">
-              <span>Manutenção</span>
+              <span className="text-slate-600">Manutenção</span>
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                <span className="font-semibold">4.7</span>
+                <Star className="h-4 w-4 text-blue-400 fill-current" />
+                <span className="font-medium text-slate-700">4.7</span>
               </div>
             </div>
           </CardContent>
@@ -166,7 +167,7 @@ const PartnerProfile = () => {
         {/* Navigation Button */}
         <Button
           onClick={() => navigate('/mobile/partner-dashboard')}
-          className="w-full h-12"
+          className="w-full h-12 bg-blue-500 hover:bg-blue-600 text-white shadow-sm"
         >
           Ir para Dashboard
         </Button>
