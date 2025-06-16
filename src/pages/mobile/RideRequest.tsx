@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft, MapPin, Car, Settings, CreditCard, Users } from 'lucide-react';
 
 const RideRequest = () => {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const RideRequest = () => {
   ];
 
   const handleRequestRide = () => {
-    // Simulate ride request
+    // Simula a solicitação de corrida
     navigate('/mobile/ride-progress');
   };
 
@@ -40,11 +40,11 @@ const RideRequest = () => {
             onClick={() => navigate('/mobile/client-dashboard')}
             className="hover:bg-slate-100"
           >
-            <span>←</span>
+            <ArrowLeft className="h-5 w-5 text-slate-600" />
           </Button>
-          <img 
-            src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
-            alt="Logo" 
+          <img
+            src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png"
+            alt="Logo"
             className="h-6"
           />
           <h1 className="text-xl font-light text-slate-700">Solicitar Corrida</h1>
@@ -56,7 +56,7 @@ const RideRequest = () => {
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg font-medium text-slate-700 flex items-center gap-2">
-              <span className="text-blue-500">📍</span>
+              <MapPin className="h-5 w-5 text-blue-500" />
               Localização
             </CardTitle>
           </CardHeader>
@@ -69,11 +69,11 @@ const RideRequest = () => {
                 id="pickup"
                 placeholder="Digite o endereço de partida"
                 value={rideData.pickup}
-                onChange={(e) => setRideData({...rideData, pickup: e.target.value})}
+                onChange={(e) => setRideData({ ...rideData, pickup: e.target.value })}
                 className="border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 h-11"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="destination" className="text-sm font-medium text-slate-700">
                 Destino
@@ -82,7 +82,7 @@ const RideRequest = () => {
                 id="destination"
                 placeholder="Para onde você quer ir?"
                 value={rideData.destination}
-                onChange={(e) => setRideData({...rideData, destination: e.target.value})}
+                onChange={(e) => setRideData({ ...rideData, destination: e.target.value })}
                 className="border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 h-11"
               />
             </div>
@@ -93,7 +93,7 @@ const RideRequest = () => {
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg font-medium text-slate-700 flex items-center gap-2">
-              <span className="text-blue-500">🚗</span>
+              <Car className="h-5 w-5 text-blue-500" />
               Tipo de Corrida
             </CardTitle>
           </CardHeader>
@@ -101,12 +101,11 @@ const RideRequest = () => {
             {rideTypes.map((type) => (
               <div
                 key={type.id}
-                className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                  rideData.rideType === type.id
+                className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${rideData.rideType === type.id
                     ? 'border-blue-400 bg-blue-50'
                     : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                }`}
-                onClick={() => setRideData({...rideData, rideType: type.id})}
+                  }`}
+                onClick={() => setRideData({ ...rideData, rideType: type.id })}
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -116,7 +115,7 @@ const RideRequest = () => {
                   <div className="text-right">
                     <p className="text-lg font-medium text-blue-600">{type.price}</p>
                     {rideData.rideType === type.id && (
-                      <Badge className="bg-blue-500 text-white">Selecionado</Badge>
+                      <Badge className="bg-blue-500 text-white mt-1">Selecionado</Badge>
                     )}
                   </div>
                 </div>
@@ -129,7 +128,7 @@ const RideRequest = () => {
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg font-medium text-slate-700 flex items-center gap-2">
-              <span className="text-blue-500">⚙️</span>
+              <Settings className="h-5 w-5 text-blue-500" />
               Opções Adicionais
             </CardTitle>
           </CardHeader>
@@ -140,7 +139,7 @@ const RideRequest = () => {
               </Label>
               <Select
                 value={rideData.passengers}
-                onValueChange={(value) => setRideData({...rideData, passengers: value})}
+                onValueChange={(value) => setRideData({ ...rideData, passengers: value })}
               >
                 <SelectTrigger className="w-full border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 bg-white h-11">
                   <SelectValue placeholder="Selecione" />
@@ -153,7 +152,7 @@ const RideRequest = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="notes" className="text-sm font-medium text-slate-700">
                 Observações (opcional)
@@ -162,7 +161,7 @@ const RideRequest = () => {
                 id="notes"
                 placeholder="Ex: Preciso de ajuda com bagagem"
                 value={rideData.notes}
-                onChange={(e) => setRideData({...rideData, notes: e.target.value})}
+                onChange={(e) => setRideData({ ...rideData, notes: e.target.value })}
                 className="border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 h-11"
               />
             </div>
@@ -174,7 +173,7 @@ const RideRequest = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-xl">💳</span>
+                <CreditCard className="h-6 w-6 text-slate-600" />
                 <div>
                   <p className="font-medium text-slate-700">Método de Pagamento</p>
                   <p className="text-sm text-slate-500">Saldo em carteira</p>
@@ -191,13 +190,12 @@ const RideRequest = () => {
         <Button
           onClick={handleRequestRide}
           disabled={!rideData.pickup || !rideData.destination || !rideData.rideType}
-          className={`w-full h-14 text-lg shadow-sm ${
-            rideData.pickup && rideData.destination && rideData.rideType
-              ? 'bg-blue-500 hover:bg-blue-600'
-              : 'bg-slate-300 cursor-not-allowed'
-          }`}
+          className={`w-full h-14 text-lg font-semibold shadow-sm flex items-center justify-center gap-2 ${rideData.pickup && rideData.destination && rideData.rideType
+              ? 'bg-blue-500 hover:bg-blue-600 text-white'
+              : 'bg-slate-300 cursor-not-allowed text-slate-500'
+            }`}
         >
-          <span className="mr-2">🚗</span>
+          <Car className="h-6 w-6" />
           Solicitar Corrida
         </Button>
       </div>
