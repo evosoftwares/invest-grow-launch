@@ -1,10 +1,16 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
+import { 
+  ArrowLeft, 
+  Clock, 
+  Camera, 
+  Star, 
+  CheckCircle 
+} from "lucide-react";
 
 const TaskApproval = () => {
   const navigate = useNavigate();
@@ -54,9 +60,11 @@ const TaskApproval = () => {
           <button
             key={star}
             onClick={() => onRatingChange(star)}
-            className={`text-2xl ${star <= rating ? 'text-blue-400' : 'text-slate-300'}`}
+            className={`p-1 ${star <= rating ? 'text-blue-400' : 'text-slate-300'}`}
           >
-            ⭐
+            <Star 
+              className={`h-6 w-6 ${star <= rating ? 'fill-current' : ''}`}
+            />
           </button>
         ))}
       </div>
@@ -74,7 +82,7 @@ const TaskApproval = () => {
             onClick={() => navigate('/mobile/client-dashboard')}
             className="hover:bg-slate-100"
           >
-            <span>←</span>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <img 
             src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
@@ -94,7 +102,7 @@ const TaskApproval = () => {
                 <h2 className="font-medium text-blue-700">Tarefas Pendentes</h2>
                 <p className="text-sm text-blue-600">{pendingTasks.length} aguardando sua aprovação</p>
               </div>
-              <div className="text-blue-500 text-2xl">⏳</div>
+              <Clock className="h-8 w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
@@ -125,7 +133,7 @@ const TaskApproval = () => {
                   <div className="flex gap-2">
                     {task.photos.map((photo, index) => (
                       <div key={index} className="w-20 h-20 bg-slate-100 rounded-lg flex items-center justify-center border border-slate-200">
-                        <span className="text-slate-400">📷</span>
+                        <Camera className="h-6 w-6 text-slate-400" />
                       </div>
                     ))}
                   </div>
@@ -187,7 +195,7 @@ const TaskApproval = () => {
         {pendingTasks.length === 0 && (
           <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
             <CardContent className="p-8 text-center">
-              <div className="text-slate-400 text-4xl mb-4">✅</div>
+              <CheckCircle className="h-16 w-16 text-slate-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-slate-700 mb-2">Tudo em Dia!</h3>
               <p className="text-slate-500">Não há tarefas pendentes de aprovação no momento.</p>
             </CardContent>
