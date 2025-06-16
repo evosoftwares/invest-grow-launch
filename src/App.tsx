@@ -32,6 +32,12 @@ import MissionDetails from "./pages/mobile/MissionDetails";
 import MissionExecution from "./pages/mobile/MissionExecution";
 import Wallet from "./pages/mobile/Wallet";
 import RewardsClub from "./pages/mobile/RewardsClub";
+import ClientDashboard from "./pages/mobile/ClientDashboard";
+import PublishMission from "./pages/mobile/PublishMission";
+import TaskApproval from "./pages/mobile/TaskApproval";
+import ClientFinance from "./pages/mobile/ClientFinance";
+import RideRequest from "./pages/mobile/RideRequest";
+import RideProgress from "./pages/mobile/RideProgress";
 
 // Create a stable query client instance
 const queryClient = new QueryClient({
@@ -66,6 +72,14 @@ const App = () => (
               <Route path="/mobile/mission-execution/:id" element={<MissionExecution />} />
               <Route path="/mobile/wallet" element={<Wallet />} />
               <Route path="/mobile/rewards-club" element={<RewardsClub />} />
+              
+              {/* Client Mobile Routes */}
+              <Route path="/mobile/client-dashboard" element={<ClientDashboard />} />
+              <Route path="/mobile/publish-mission" element={<PublishMission />} />
+              <Route path="/mobile/task-approval" element={<TaskApproval />} />
+              <Route path="/mobile/client-finance" element={<ClientFinance />} />
+              <Route path="/mobile/ride-request" element={<RideRequest />} />
+              <Route path="/mobile/ride-progress" element={<RideProgress />} />
               
               {/* Admin Routes */}
               <Route 
