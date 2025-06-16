@@ -81,18 +81,7 @@ const RideRequest = () => {
       </div>
 
       <div className="p-4 space-y-6">
-        {/* Mapa Placeholder */}
-        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-          <CardContent className="p-0">
-            <div className="h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center rounded-t-lg">
-              <div className="text-center">
-                <MapPin className="h-12 w-12 text-blue-500 mx-auto mb-2" />
-                <p className="text-slate-600">Mapa Interativo</p>
-                <p className="text-sm text-slate-500">Sua localização atual</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        
 
         {/* Endereços */}
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
