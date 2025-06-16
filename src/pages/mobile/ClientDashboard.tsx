@@ -1,9 +1,20 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { 
+  Bell, 
+  Briefcase, 
+  Clock, 
+  CheckCircle, 
+  BarChart3, 
+  TrendingUp, 
+  AlertTriangle, 
+  Plus, 
+  Car, 
+  CreditCard 
+} from "lucide-react";
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -27,7 +38,7 @@ const ClientDashboard = () => {
           </div>
           <div className="relative">
             <Button variant="ghost" size="icon" className="hover:bg-slate-100">
-              <span className="text-slate-600">🔔</span>
+              <Bell className="h-5 w-5 text-slate-600" />
               {notifications > 0 && (
                 <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-blue-500">
                   {notifications}
@@ -48,7 +59,7 @@ const ClientDashboard = () => {
                 <h2 className="text-3xl font-light">R$ 850,00</h2>
                 <p className="text-blue-100">Disponível para missões</p>
               </div>
-              <div className="text-blue-200 text-4xl">💼</div>
+              <Briefcase className="h-10 w-10 text-blue-200" />
             </div>
             <Button 
               onClick={() => navigate('/mobile/client-finance')}
@@ -64,14 +75,14 @@ const ClientDashboard = () => {
         <div className="grid grid-cols-2 gap-4">
           <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
             <CardContent className="p-4 text-center">
-              <div className="text-blue-500 text-2xl mb-2">⏳</div>
+              <Clock className="h-8 w-8 text-blue-500 mx-auto mb-2" />
               <p className="text-2xl font-light text-slate-700">3</p>
               <p className="text-sm text-slate-500">Pendentes</p>
             </CardContent>
           </Card>
           <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
             <CardContent className="p-4 text-center">
-              <div className="text-blue-500 text-2xl mb-2">✅</div>
+              <CheckCircle className="h-8 w-8 text-blue-500 mx-auto mb-2" />
               <p className="text-2xl font-light text-slate-700">12</p>
               <p className="text-sm text-slate-500">Concluídas</p>
             </CardContent>
@@ -81,14 +92,14 @@ const ClientDashboard = () => {
         <div className="grid grid-cols-2 gap-4">
           <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
             <CardContent className="p-4 text-center">
-              <div className="text-blue-400 text-2xl mb-2">📊</div>
+              <BarChart3 className="h-8 w-8 text-blue-400 mx-auto mb-2" />
               <p className="text-2xl font-light text-slate-700">4.9</p>
               <p className="text-sm text-slate-500">Satisfação</p>
             </CardContent>
           </Card>
           <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
             <CardContent className="p-4 text-center">
-              <div className="text-blue-500 text-2xl mb-2">📈</div>
+              <TrendingUp className="h-8 w-8 text-blue-500 mx-auto mb-2" />
               <p className="text-2xl font-light text-slate-700">85%</p>
               <p className="text-sm text-slate-500">Taxa Sucesso</p>
             </CardContent>
@@ -100,7 +111,7 @@ const ClientDashboard = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="text-blue-500 text-xl">⚠️</div>
+                <AlertTriangle className="h-5 w-5 text-blue-500" />
                 <div>
                   <p className="font-medium text-blue-700">2 Aprovações Pendentes</p>
                   <p className="text-sm text-blue-600">Revisar trabalhos concluídos</p>
@@ -122,7 +133,7 @@ const ClientDashboard = () => {
           onClick={() => navigate('/mobile/publish-mission')}
           className="w-full h-16 bg-blue-500 hover:bg-blue-600 text-lg shadow-sm"
         >
-          <span className="mr-2">➕</span>
+          <Plus className="h-5 w-5 mr-2" />
           Publicar Nova Missão
         </Button>
 
@@ -133,6 +144,7 @@ const ClientDashboard = () => {
             className="h-12 border-slate-200 hover:bg-slate-50"
             onClick={() => navigate('/mobile/ride-request')}
           >
+            <Car className="h-4 w-4 mr-2" />
             Solicitar Corrida
           </Button>
           <Button 
@@ -140,6 +152,7 @@ const ClientDashboard = () => {
             className="h-12 border-slate-200 hover:bg-slate-50"
             onClick={() => navigate('/mobile/client-finance')}
           >
+            <CreditCard className="h-4 w-4 mr-2" />
             Financeiro
           </Button>
         </div>
