@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 
 const PublishMission = () => {
@@ -15,14 +16,20 @@ const PublishMission = () => {
     address: '',
     value: '',
     estimatedTime: '',
-    category: 'delivery'
+    category: ''
   });
 
   const categories = [
     { id: 'delivery', name: 'Entrega' },
     { id: 'transport', name: 'Transporte' },
     { id: 'photo', name: 'Fotografia' },
-    { id: 'cleaning', name: 'Limpeza' }
+    { id: 'cleaning', name: 'Limpeza' },
+    { id: 'maintenance', name: 'Manutenção' },
+    { id: 'shopping', name: 'Compras' },
+    { id: 'consulting', name: 'Consultoria' },
+    { id: 'design', name: 'Design' },
+    { id: 'writing', name: 'Redação' },
+    { id: 'translation', name: 'Tradução' }
   ];
 
   const checklistTemplates = [
@@ -136,21 +143,27 @@ const PublishMission = () => {
             <CardTitle className="text-lg font-medium text-slate-700">Categoria</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              {categories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant={formData.category === category.id ? "default" : "outline"}
-                  className={`h-16 flex-col gap-2 ${
-                    formData.category === category.id 
-                      ? "bg-blue-500 hover:bg-blue-600" 
-                      : "border-slate-200 hover:bg-slate-50"
-                  }`}
-                  onClick={() => setFormData({...formData, category: category.id})}
-                >
-                  <span className="text-sm">{category.name}</span>
-                </Button>
-              ))}
+            <div>
+              <Label htmlFor="category" className="text-slate-600">Selecione a categoria</Label>
+              <Select 
+                value={formData.category} 
+                onValueChange={(value) => setFormData({...formData, category: value})}
+              >
+                <SelectTrigger className="w-full border-slate-200 focus:border-blue-300 bg-white">
+                  <SelectValue placeholder="Escolha uma categoria" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-slate-200 z-50">
+                  {categories.map((category) => (
+                    <SelectItem 
+                      key={category.id} 
+                      value={category.id}
+                      className="hover:bg-blue-50 focus:bg-blue-50"
+                    >
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
