@@ -67,7 +67,7 @@ const PublishMission = () => {
       </div>
 
       {/* Content */}
-      <div className="pb-24"> {/* Added bottom padding for floating button */}
+      <div className="pb-24">
         <div className="px-4 py-6 space-y-6 max-w-2xl mx-auto">
           {/* Informações Básicas */}
           <Card className="border-slate-200 bg-white/95 backdrop-blur-sm shadow-sm">
@@ -184,7 +184,7 @@ const PublishMission = () => {
                   <SelectTrigger className="w-full border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 bg-white h-11">
                     <SelectValue placeholder="Escolha uma categoria" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-slate-200 shadow-lg">
+                  <SelectContent className="bg-white border-slate-200 shadow-lg z-50">
                     {categories.map((category) => (
                       <SelectItem 
                         key={category.id} 
@@ -212,8 +212,7 @@ const PublishMission = () => {
               </p>
             </CardHeader>
             <CardContent className="space-y-3">
-              {checklistTempl
-ates.map((template) => (
+              {checklistTemplates.map((template) => (
                 <div 
                   key={template.id} 
                   className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
