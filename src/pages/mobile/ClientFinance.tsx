@@ -103,7 +103,7 @@ const ClientFinance = () => {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="font-light text-slate-700 text-base">R$ 450,00</p>
+                <p className="font-light text-slate-700 text-lg">R$ 450,00</p>
                 <p className="text-sm text-slate-500">Total Gasto</p>
               </div>
               <div className="text-center p-4 bg-blue-50 rounded-lg">
@@ -137,7 +137,7 @@ const ClientFinance = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={`font-medium ${transaction.type === 'credit' ? 'text-blue-600' : 'text-slate-600'}`}>
+                  <p className="text-xs">
                     {transaction.type === 'credit' ? '+' : ''}R$ {Math.abs(transaction.amount).toFixed(2)}
                   </p>
                   <Badge variant={transaction.status === 'completed' ? 'default' : 'secondary'} className={transaction.status === 'completed' ? 'bg-blue-500' : 'bg-slate-200 text-slate-600'}>
