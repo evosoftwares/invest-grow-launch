@@ -1,9 +1,19 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { 
+  ArrowLeft, 
+  Wallet, 
+  Shield, 
+  Plus, 
+  Minus, 
+  TrendingUp, 
+  ArrowDownLeft, 
+  ArrowUpRight, 
+  CreditCard 
+} from "lucide-react";
 
 const ClientFinance = () => {
   const navigate = useNavigate();
@@ -47,7 +57,7 @@ const ClientFinance = () => {
       <div className="bg-white/90 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/mobile/client-dashboard')} className="hover:bg-slate-100">
-            <span>←</span>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <img 
             src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
@@ -69,7 +79,7 @@ const ClientFinance = () => {
                   <h2 className="text-3xl font-light">R$ 850,00</h2>
                   <p className="text-blue-100">Para novas missões</p>
                 </div>
-                <div className="text-blue-200 text-4xl">💰</div>
+                <Wallet className="h-10 w-10 text-blue-200" />
               </div>
             </CardContent>
           </Card>
@@ -82,7 +92,7 @@ const ClientFinance = () => {
                   <h2 className="text-3xl font-light">R$ 120,00</h2>
                   <p className="text-blue-100">Aguardando aprovação</p>
                 </div>
-                <div className="text-blue-200 text-4xl">🛡️</div>
+                <Shield className="h-10 w-10 text-blue-200" />
               </div>
             </CardContent>
           </Card>
@@ -91,11 +101,11 @@ const ClientFinance = () => {
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-4">
           <Button className="h-14 bg-blue-500 hover:bg-blue-600 shadow-sm">
-            <span className="mr-2">➕</span>
+            <Plus className="h-5 w-5 mr-2" />
             Adicionar Fundos
           </Button>
           <Button variant="outline" className="h-14 border-slate-200 hover:bg-slate-50">
-            <span className="mr-2">➖</span>
+            <Minus className="h-5 w-5 mr-2" />
             Retirar Fundos
           </Button>
         </div>
@@ -104,7 +114,7 @@ const ClientFinance = () => {
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg font-medium text-slate-700 flex items-center gap-2">
-              <span className="text-blue-500">📈</span>
+              <TrendingUp className="h-5 w-5 text-blue-500" />
               Resumo do Mês
             </CardTitle>
           </CardHeader>
@@ -137,7 +147,10 @@ const ClientFinance = () => {
               <div key={transaction.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-full ${transaction.type === 'credit' ? 'bg-blue-50 text-blue-500' : 'bg-slate-100 text-slate-500'}`}>
-                    {transaction.type === 'credit' ? '↙️' : '↗️'}
+                    {transaction.type === 'credit' ? 
+                      <ArrowDownLeft className="h-4 w-4" /> : 
+                      <ArrowUpRight className="h-4 w-4" />
+                    }
                   </div>
                   <div>
                     <p className="font-medium text-slate-700">{transaction.description}</p>
@@ -179,7 +192,7 @@ const ClientFinance = () => {
             <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-slate-300 rounded flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">••••</span>
+                  <CreditCard className="h-4 w-4 text-white" />
                 </div>
                 <div>
                   <p className="font-medium text-slate-700">Cartão •••• 1234</p>
