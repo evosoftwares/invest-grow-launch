@@ -23,6 +23,16 @@ import AuthPage from "./components/auth/AuthPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { ErrorBoundary } from './components/ErrorBoundary';
 
+// Mobile Pages
+import MobileLogin from "./pages/mobile/MobileLogin";
+import PartnerProfile from "./pages/mobile/PartnerProfile";
+import PartnerDashboardMobile from "./pages/mobile/PartnerDashboard";
+import FeedOpportunities from "./pages/mobile/FeedOpportunities";
+import MissionDetails from "./pages/mobile/MissionDetails";
+import MissionExecution from "./pages/mobile/MissionExecution";
+import Wallet from "./pages/mobile/Wallet";
+import RewardsClub from "./pages/mobile/RewardsClub";
+
 // Create a stable query client instance
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,6 +56,18 @@ const App = () => (
               <Route path="/calculadora" element={<ROICalculatorPage />} />
               <Route path="/como-funciona" element={<HowItWorksPage />} />
               <Route path="/auth" element={<AuthPage />} />
+              
+              {/* Mobile Routes */}
+              <Route path="/mobile/login" element={<MobileLogin />} />
+              <Route path="/mobile/partner-profile" element={<PartnerProfile />} />
+              <Route path="/mobile/partner-dashboard" element={<PartnerDashboardMobile />} />
+              <Route path="/mobile/feed-opportunities" element={<FeedOpportunities />} />
+              <Route path="/mobile/mission-details/:id" element={<MissionDetails />} />
+              <Route path="/mobile/mission-execution/:id" element={<MissionExecution />} />
+              <Route path="/mobile/wallet" element={<Wallet />} />
+              <Route path="/mobile/rewards-club" element={<RewardsClub />} />
+              
+              {/* Admin Routes */}
               <Route 
                 path="/admin/dashboard" 
                 element={
@@ -86,6 +108,8 @@ const App = () => (
                   </ProtectedRoute>
                 } 
               />
+              
+              {/* Partner Routes */}
               <Route 
                 path="/partner/dashboard" 
                 element={
@@ -126,7 +150,8 @@ const App = () => (
                   </ProtectedRoute>
                 } 
               />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              
+              {/* Catch-all route MUST be last */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
