@@ -6,15 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
-import { 
-  ArrowLeft, 
-  MapPin, 
-  DollarSign,
-  Clock,
-  FileText,
-  Camera,
-  CheckSquare
-} from "lucide-react";
 
 const PublishMission = () => {
   const navigate = useNavigate();
@@ -28,10 +19,10 @@ const PublishMission = () => {
   });
 
   const categories = [
-    { id: 'delivery', name: 'Entrega', icon: '📦' },
-    { id: 'transport', name: 'Transporte', icon: '🚗' },
-    { id: 'photo', name: 'Fotografia', icon: '📸' },
-    { id: 'cleaning', name: 'Limpeza', icon: '🧹' }
+    { id: 'delivery', name: 'Entrega' },
+    { id: 'transport', name: 'Transporte' },
+    { id: 'photo', name: 'Fotografia' },
+    { id: 'cleaning', name: 'Limpeza' }
   ];
 
   const checklistTemplates = [
@@ -56,7 +47,7 @@ const PublishMission = () => {
             onClick={() => navigate('/mobile/client-dashboard')}
             className="hover:bg-slate-100"
           >
-            <ArrowLeft className="h-5 w-5 text-slate-600" />
+            ←
           </Button>
           <h1 className="text-xl font-light text-slate-700">Nova Missão</h1>
         </div>
@@ -66,8 +57,7 @@ const PublishMission = () => {
         {/* Informações Básicas */}
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-medium text-slate-700 flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-500" />
+            <CardTitle className="text-lg font-medium text-slate-700">
               Informações da Missão
             </CardTitle>
           </CardHeader>
@@ -99,8 +89,7 @@ const PublishMission = () => {
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardContent className="p-4 space-y-4">
             <div>
-              <Label htmlFor="address" className="text-slate-600 flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-blue-500" />
+              <Label htmlFor="address" className="text-slate-600">
                 Endereço
               </Label>
               <Input
@@ -113,8 +102,7 @@ const PublishMission = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="value" className="text-slate-600 flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-blue-500" />
+                <Label htmlFor="value" className="text-slate-600">
                   Valor (R$)
                 </Label>
                 <Input
@@ -127,8 +115,7 @@ const PublishMission = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="time" className="text-slate-600 flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-blue-500" />
+                <Label htmlFor="time" className="text-slate-600">
                   Tempo Est.
                 </Label>
                 <Input
@@ -161,7 +148,6 @@ const PublishMission = () => {
                   }`}
                   onClick={() => setFormData({...formData, category: category.id})}
                 >
-                  <span className="text-2xl">{category.icon}</span>
                   <span className="text-sm">{category.name}</span>
                 </Button>
               ))}
@@ -172,8 +158,7 @@ const PublishMission = () => {
         {/* Templates de Checklist */}
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-medium text-slate-700 flex items-center gap-2">
-              <CheckSquare className="h-5 w-5 text-blue-500" />
+            <CardTitle className="text-lg font-medium text-slate-700">
               Template de Checklist
             </CardTitle>
           </CardHeader>
