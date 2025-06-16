@@ -13,8 +13,46 @@ import {
   AlertTriangle,
   Plus,
   Car,
-  CreditCard
+  CreditCard,
+  ArrowUpRight,  // Ícone para pagamentos (saídas)
+  ArrowDownLeft, // Ícone para recargas/reembolsos (entradas)
 } from "lucide-react";
+
+// --- Dados de Exemplo para o Extrato ---
+const transactions = [
+  {
+    type: 'payment',
+    description: 'Pagamento - Entrega de Documentos',
+    actor: 'João Silva',
+    date: '2024-01-15',
+    amount: '25.00',
+    status: 'paid'
+  },
+  {
+    type: 'credit',
+    description: 'Recarga de Saldo',
+    actor: 'PIX',
+    date: '2024-01-15',
+    amount: '200.00',
+    status: 'paid'
+  },
+  {
+    type: 'payment',
+    description: 'Pagamento - Corrida Aeroporto',
+    actor: 'Maria Santos',
+    date: '2024-01-14',
+    amount: '45.00',
+    status: 'pending'
+  },
+  {
+    type: 'credit',
+    description: 'Reembolso Missão Cancelada',
+    actor: 'Sistema',
+    date: '2024-01-13',
+    amount: '30.00',
+    status: 'paid'
+  }
+];
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -32,7 +70,6 @@ const ClientDashboard = () => {
               className="h-8"
             />
             <div>
-              {/* Responsive font size and text truncation for the title */}
               <h1 className="text-lg sm:text-xl font-light text-slate-700 truncate">Dashboard Cliente</h1>
               <p className="text-sm text-slate-500">Olá, Maria!</p>
             </div>
@@ -57,7 +94,6 @@ const ClientDashboard = () => {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-blue-100">Saldo em Garantia</p>
-                {/* Responsive font size to prevent wrapping */}
                 <h2 className="text-3xl sm:text-4xl font-light whitespace-nowrap">R$ 850,00</h2>
                 <p className="text-blue-100 text-sm">Disponível para missões</p>
               </div>
@@ -73,49 +109,55 @@ const ClientDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Status das Operações */}
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-            <CardContent className="p-4 text-center flex flex-col items-center justify-center">
-              <Clock className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 mx-auto mb-2" />
-              {/* Responsive font size */}
-              <p className="text-2xl sm:text-3xl font-light text-slate-700">3</p>
-              <p className="text-xs sm:text-sm text-slate-500">Pendentes</p>
-            </CardContent>
-          </Card>
-          <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-            <CardContent className="p-4 text-center flex flex-col items-center justify-center">
-              <CheckCircle className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 mx-auto mb-2" />
-              {/* Responsive font size */}
-              <p className="text-2xl sm:text-3xl font-light text-slate-700">12</p>
-              <p className="text-xs sm:text-sm text-slate-500">Concluídas</p>
-            </CardContent>
-          </Card>
-        </div>
+        {/* --- NOVO: Seção de Extrato Detalhado --- */}
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl font-light text-slate-700">Extrato Detalhado</CardTitle>
+              <Badge variant="secondary">{transactions.length}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {transactions.map((item, index) => (
+                <div key={index} className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4 last:border-b-0 last:pb-0">
+                  {/* Ícone e Descrição */}
+                  <div className="flex items-start gap-3 flex-grow min-w-0">
+                    <div className="flex-shrink-0 mt-1">
+                      {item.type === 'credit' ? (
+                        <ArrowDownLeft className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <ArrowUpRight className="h-5 w-5 text-red-500" />
+                      )}
+                    </div>
+                    <div className="flex-grow">
+                      <p className="font-medium text-slate-800 truncate">{item.description}</p>
+                      <p className="text-sm text-slate-500">{item.actor}</p>
+                      <p className="text-xs text-slate-400">{item.date}</p>
+                    </div>
+                  </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-            <CardContent className="p-4 text-center flex flex-col items-center justify-center">
-              <BarChart3 className="h-7 w-7 sm:h-8 sm:w-8 text-blue-400 mx-auto mb-2" />
-               {/* Responsive font size */}
-              <p className="text-2xl sm:text-3xl font-light text-slate-700">4.9</p>
-              <p className="text-xs sm:text-sm text-slate-500">Satisfação</p>
-            </CardContent>
-          </Card>
-          <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-            <CardContent className="p-4 text-center flex flex-col items-center justify-center">
-              <TrendingUp className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 mx-auto mb-2" />
-               {/* Responsive font size */}
-              <p className="text-2xl sm:text-3xl font-light text-slate-700">85%</p>
-              <p className="text-xs sm:text-sm text-slate-500">Taxa Sucesso</p>
-            </CardContent>
-          </Card>
-        </div>
+                  {/* Valor e Status */}
+                  <div className="text-right flex-shrink-0">
+                    <p className={`font-bold text-lg ${item.type === 'credit' ? 'text-green-600' : 'text-slate-800'} whitespace-nowrap`}>
+                      {item.type === 'credit' ? `+R$ ${item.amount}` : `R$ ${item.amount}`}
+                    </p>
+                    {item.status === 'paid' ? (
+                      <Badge className="bg-blue-500 hover:bg-blue-600">Pago</Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-slate-500">Pendente</Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
 
         {/* Aprovações Pendentes */}
         <Card className="border-blue-200 bg-blue-50/50 backdrop-blur-sm">
           <CardContent className="p-4">
-            {/* Using flex-wrap for very small screens */}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <AlertTriangle className="h-6 w-6 text-blue-500 flex-shrink-0" />
