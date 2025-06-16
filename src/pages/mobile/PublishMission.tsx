@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,10 +55,13 @@ const PublishMission = () => {
             onClick={() => navigate('/mobile/client-dashboard')}
             className="hover:bg-slate-100 rounded-full"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <span>←</span>
           </Button>
+          <img 
+            src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
+            alt="Logo" 
+            className="h-6"
+          />
           <h1 className="text-xl font-semibold text-slate-800">Nova Missão</h1>
         </div>
       </div>
@@ -208,7 +212,8 @@ const PublishMission = () => {
               </p>
             </CardHeader>
             <CardContent className="space-y-3">
-              {checklistTemplates.map((template) => (
+              {checklistTempl
+ates.map((template) => (
                 <div 
                   key={template.id} 
                   className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${

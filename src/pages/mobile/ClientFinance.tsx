@@ -1,9 +1,10 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Wallet, TrendingUp, ArrowUpRight, ArrowDownLeft, Plus, Minus, Shield, Clock } from "lucide-react";
+
 const ClientFinance = () => {
   const navigate = useNavigate();
   const transactions = [{
@@ -39,13 +40,20 @@ const ClientFinance = () => {
     status: 'completed',
     partner: 'Sistema'
   }];
-  return <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
       <div className="bg-white/90 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/mobile/client-dashboard')} className="hover:bg-slate-100">
-            <ArrowLeft className="h-5 w-5 text-slate-600" />
+            <span>←</span>
           </Button>
+          <img 
+            src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
+            alt="Logo" 
+            className="h-6"
+          />
           <h1 className="text-xl font-light text-slate-700">Gestão Financeira</h1>
         </div>
       </div>
@@ -57,11 +65,11 @@ const ClientFinance = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 px-[84px]">Saldo Disponível</p>
+                  <p className="text-blue-100">Saldo Disponível</p>
                   <h2 className="text-3xl font-light">R$ 850,00</h2>
                   <p className="text-blue-100">Para novas missões</p>
                 </div>
-                <Wallet className="h-12 w-12 text-blue-200" />
+                <div className="text-blue-200 text-4xl">💰</div>
               </div>
             </CardContent>
           </Card>
@@ -74,7 +82,7 @@ const ClientFinance = () => {
                   <h2 className="text-3xl font-light">R$ 120,00</h2>
                   <p className="text-blue-100">Aguardando aprovação</p>
                 </div>
-                <Shield className="h-12 w-12 text-blue-200" />
+                <div className="text-blue-200 text-4xl">🛡️</div>
               </div>
             </CardContent>
           </Card>
@@ -83,11 +91,11 @@ const ClientFinance = () => {
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-4">
           <Button className="h-14 bg-blue-500 hover:bg-blue-600 shadow-sm">
-            <Plus className="h-5 w-5 mr-2" />
+            <span className="mr-2">➕</span>
             Adicionar Fundos
           </Button>
           <Button variant="outline" className="h-14 border-slate-200 hover:bg-slate-50">
-            <Minus className="h-5 w-5 mr-2 text-slate-600" />
+            <span className="mr-2">➖</span>
             Retirar Fundos
           </Button>
         </div>
@@ -96,7 +104,7 @@ const ClientFinance = () => {
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg font-medium text-slate-700 flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-blue-500" />
+              <span className="text-blue-500">📈</span>
               Resumo do Mês
             </CardTitle>
           </CardHeader>
@@ -125,10 +133,11 @@ const ClientFinance = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {transactions.map(transaction => <div key={transaction.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
+            {transactions.map(transaction => (
+              <div key={transaction.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-full ${transaction.type === 'credit' ? 'bg-blue-50 text-blue-500' : 'bg-slate-100 text-slate-500'}`}>
-                    {transaction.type === 'credit' ? <ArrowDownLeft className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
+                    {transaction.type === 'credit' ? '↙️' : '↗️'}
                   </div>
                   <div>
                     <p className="font-medium text-slate-700">{transaction.description}</p>
@@ -144,7 +153,8 @@ const ClientFinance = () => {
                     {transaction.status === 'completed' ? 'Pago' : 'Pendente'}
                   </Badge>
                 </div>
-              </div>)}
+              </div>
+            ))}
           </CardContent>
         </Card>
 
@@ -180,6 +190,8 @@ const ClientFinance = () => {
           </CardContent>
         </Card>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default ClientFinance;

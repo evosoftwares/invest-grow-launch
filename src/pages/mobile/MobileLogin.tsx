@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 const MobileLogin = () => {
   const [email, setEmail] = useState('');
@@ -36,7 +35,7 @@ const MobileLogin = () => {
           <img 
             src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
             alt="Logo" 
-            className="h-16 mx-auto mb-4"
+            className="h-20 mx-auto mb-4"
           />
           <h1 className="text-2xl font-light text-slate-700">Bem-vindo</h1>
           <p className="text-slate-500">Faça login para continuar</p>
@@ -49,32 +48,30 @@ const MobileLogin = () => {
           <CardContent className="space-y-4">
             {/* Email Field */}
             <div className="relative">
-              <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
               <Input
                 type="email"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-10 h-12 border-slate-200 focus:border-blue-300 focus:ring-blue-200"
+                className="h-12 border-slate-200 focus:border-blue-300 focus:ring-blue-200"
               />
             </div>
 
             {/* Password Field */}
             <div className="relative">
-              <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
               <Input
                 type={showPassword ? "text" : "password"}
                 placeholder="Senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 pr-10 h-12 border-slate-200 focus:border-blue-300 focus:ring-blue-200"
+                className="h-12 border-slate-200 focus:border-blue-300 focus:ring-blue-200"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
               >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                {showPassword ? 'Ocultar' : 'Mostrar'}
               </button>
             </div>
 

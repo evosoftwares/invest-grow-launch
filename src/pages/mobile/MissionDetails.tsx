@@ -4,18 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate, useParams } from "react-router-dom";
-import { 
-  ArrowLeft, 
-  MapPin, 
-  Clock, 
-  DollarSign, 
-  User,
-  Phone,
-  Star,
-  Package,
-  AlertTriangle,
-  CheckCircle
-} from "lucide-react";
 
 const MissionDetails = () => {
   const navigate = useNavigate();
@@ -68,8 +56,13 @@ const MissionDetails = () => {
             onClick={() => navigate('/mobile/feed-opportunities')}
             className="hover:bg-slate-100"
           >
-            <ArrowLeft className="h-5 w-5 text-slate-600" />
+            <span>←</span>
           </Button>
+          <img 
+            src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
+            alt="Logo" 
+            className="h-6"
+          />
           <h1 className="text-xl font-light text-slate-700">Detalhes da Missão</h1>
         </div>
       </div>
@@ -81,7 +74,7 @@ const MissionDetails = () => {
             <div className="flex items-start justify-between mb-4">
               <div>
                 <Badge className="bg-blue-50 text-blue-700 border-blue-200 mb-2">
-                  <Package className="h-4 w-4 mr-1" />
+                  <span className="mr-1">📦</span>
                   Entrega
                 </Badge>
                 <h2 className="text-xl font-medium text-slate-700">{mission.title}</h2>
@@ -91,7 +84,7 @@ const MissionDetails = () => {
                   R$ {mission.value.toFixed(2)}
                 </p>
                 <div className="flex items-center gap-1 justify-end">
-                  <Clock className="h-4 w-4 text-slate-400" />
+                  <span>⏰</span>
                   <span className="text-sm text-slate-500">{mission.estimatedTime}</span>
                 </div>
               </div>
@@ -100,16 +93,16 @@ const MissionDetails = () => {
             <p className="text-slate-600 mb-4">{mission.description}</p>
 
             <div className="flex items-center gap-2 mb-3">
-              <User className="h-4 w-4 text-slate-400" />
+              <span>👤</span>
               <span className="font-medium text-slate-700">{mission.client}</span>
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 text-blue-400 fill-current" />
+                <span className="text-blue-400">⭐</span>
                 <span className="text-sm text-slate-500">{mission.rating}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-slate-400" />
+              <span>📍</span>
               <span className="text-slate-600">{mission.address}</span>
             </div>
           </CardContent>
@@ -119,7 +112,7 @@ const MissionDetails = () => {
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-medium text-slate-700">
-              <Package className="h-5 w-5 text-blue-500" />
+              <span className="text-blue-500">📦</span>
               Equipamento Necessário
             </CardTitle>
           </CardHeader>
@@ -127,7 +120,7 @@ const MissionDetails = () => {
             <div className="space-y-2">
               {mission.equipment.map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-500" />
+                  <span className="text-blue-500">✅</span>
                   <span className="text-sm text-slate-600">{item}</span>
                 </div>
               ))}
@@ -139,18 +132,18 @@ const MissionDetails = () => {
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-medium text-slate-700">
-              <Phone className="h-5 w-5 text-blue-500" />
+              <span className="text-blue-500">📞</span>
               Contato no Local
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-slate-400" />
+                <span>👤</span>
                 <span className="text-slate-600">{mission.contact.name}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-slate-400" />
+                <span>📞</span>
                 <span className="text-slate-600">{mission.contact.phone}</span>
               </div>
             </div>
@@ -161,7 +154,7 @@ const MissionDetails = () => {
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-medium text-slate-700">
-              <AlertTriangle className="h-5 w-5 text-blue-500" />
+              <span className="text-blue-500">⚠️</span>
               Requisitos Importantes
             </CardTitle>
           </CardHeader>
@@ -169,7 +162,7 @@ const MissionDetails = () => {
             <div className="space-y-2">
               {mission.requirements.map((req, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-blue-400" />
+                  <span className="text-blue-400">⚠️</span>
                   <span className="text-sm text-slate-600">{req}</span>
                 </div>
               ))}
@@ -182,7 +175,7 @@ const MissionDetails = () => {
           onClick={handleAcceptMission}
           className="w-full h-14 text-lg bg-blue-500 hover:bg-blue-600 shadow-sm"
         >
-          <CheckCircle className="h-6 w-6 mr-2" />
+          <span className="mr-2">✅</span>
           ACEITAR MISSÃO
         </Button>
       </div>

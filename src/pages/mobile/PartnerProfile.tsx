@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload, CheckCircle, AlertCircle, Clock, Star } from "lucide-react";
 
 const PartnerProfile = () => {
   const navigate = useNavigate();
@@ -25,9 +24,9 @@ const PartnerProfile = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'verified': return <CheckCircle className="h-5 w-5 text-blue-500" />;
-      case 'pending': return <AlertCircle className="h-5 w-5 text-blue-400" />;
-      default: return <Clock className="h-5 w-5 text-slate-400" />;
+      case 'verified': return '✅';
+      case 'pending': return '⚠️';
+      default: return '⏰';
     }
   };
 
@@ -58,8 +57,13 @@ const PartnerProfile = () => {
             onClick={() => navigate('/mobile/login')}
             className="hover:bg-slate-100"
           >
-            <ArrowLeft className="h-5 w-5 text-slate-600" />
+            <span>←</span>
           </Button>
+          <img 
+            src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
+            alt="Logo" 
+            className="h-6"
+          />
           <h1 className="text-xl font-light text-slate-700">Perfil e Serviços</h1>
         </div>
       </div>
@@ -76,7 +80,7 @@ const PartnerProfile = () => {
                 <h2 className="font-medium text-slate-700">João da Silva</h2>
                 <p className="text-slate-500">Parceiro desde 2024</p>
                 <div className="flex items-center gap-1 mt-1">
-                  <Star className="h-4 w-4 text-blue-400 fill-current" />
+                  <span className="text-blue-400">⭐</span>
                   <span className="text-sm text-slate-600">4.8 (234 avaliações)</span>
                 </div>
               </div>
@@ -122,7 +126,7 @@ const PartnerProfile = () => {
             {documents.map((doc, index) => (
               <div key={index} className="flex items-center justify-between p-3 border border-slate-100 rounded-lg bg-white">
                 <div className="flex items-center gap-3">
-                  {getStatusIcon(doc.status)}
+                  <span className="text-xl">{getStatusIcon(doc.status)}</span>
                   <div>
                     <div className="font-medium text-slate-700">{doc.name}</div>
                     <div className="text-sm text-slate-500">{doc.message}</div>
@@ -135,7 +139,7 @@ const PartnerProfile = () => {
             ))}
             
             <Button variant="outline" className="w-full mt-4 border-slate-200 hover:bg-slate-50">
-              <Upload className="h-4 w-4 mr-2 text-slate-600" />
+              <span className="mr-2">📤</span>
               Enviar Documentos
             </Button>
           </CardContent>
@@ -150,14 +154,14 @@ const PartnerProfile = () => {
             <div className="flex justify-between items-center">
               <span className="text-slate-600">Entrega/Delivery</span>
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 text-blue-400 fill-current" />
+                <span className="text-blue-400">⭐</span>
                 <span className="font-medium text-slate-700">4.9</span>
               </div>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-600">Manutenção</span>
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 text-blue-400 fill-current" />
+                <span className="text-blue-400">⭐</span>
                 <span className="font-medium text-slate-700">4.7</span>
               </div>
             </div>

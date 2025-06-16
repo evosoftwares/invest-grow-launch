@@ -5,17 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { 
-  ArrowLeft, 
-  MapPin, 
-  Clock, 
-  DollarSign, 
-  Filter,
-  Star,
-  Truck,
-  Package,
-  Wrench
-} from "lucide-react";
 
 const FeedOpportunities = () => {
   const navigate = useNavigate();
@@ -65,10 +54,10 @@ const FeedOpportunities = () => {
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case 'delivery': return <Package className="h-5 w-5" />;
-      case 'transport': return <Truck className="h-5 w-5" />;
-      case 'maintenance': return <Wrench className="h-5 w-5" />;
-      default: return <Package className="h-5 w-5" />;
+      case 'delivery': return '📦';
+      case 'transport': return '🚛';
+      case 'maintenance': return '🔧';
+      default: return '📦';
     }
   };
 
@@ -93,8 +82,13 @@ const FeedOpportunities = () => {
               onClick={() => navigate('/mobile/partner-dashboard')}
               className="hover:bg-slate-100"
             >
-              <ArrowLeft className="h-5 w-5 text-slate-600" />
+              <span>←</span>
             </Button>
+            <img 
+              src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
+              alt="Logo" 
+              className="h-6"
+            />
             <h1 className="text-xl font-light text-slate-700">Oportunidades</h1>
           </div>
           <Button
@@ -103,7 +97,7 @@ const FeedOpportunities = () => {
             onClick={() => setShowFilters(!showFilters)}
             className="border-slate-200 hover:bg-slate-50"
           >
-            <Filter className="h-5 w-5 text-slate-600" />
+            <span>🔍</span>
           </Button>
         </div>
       </div>
@@ -165,7 +159,7 @@ const FeedOpportunities = () => {
                       <Badge className="bg-blue-500 text-white">Urgente</Badge>
                     )}
                     {mission.favorite && (
-                      <Star className="h-4 w-4 text-blue-400 fill-current" />
+                      <span className="text-blue-400">⭐</span>
                     )}
                   </div>
                   <div className="text-right">
@@ -180,24 +174,24 @@ const FeedOpportunities = () => {
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm font-medium text-slate-600">{mission.client}</span>
                   <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3 text-blue-400 fill-current" />
+                    <span className="text-blue-400">⭐</span>
                     <span className="text-xs text-slate-500">{mission.rating}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 text-slate-500 mb-3">
-                  <MapPin className="h-4 w-4" />
+                  <span>📍</span>
                   <span className="text-sm flex-1">{mission.address}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 text-sm text-slate-500">
                     <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
+                      <span>📍</span>
                       <span>{mission.distance}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
+                      <span>⏰</span>
                       <span>{mission.time}</span>
                     </div>
                   </div>

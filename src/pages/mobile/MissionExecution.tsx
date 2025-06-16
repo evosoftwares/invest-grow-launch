@@ -5,15 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate, useParams } from "react-router-dom";
-import { 
-  ArrowLeft, 
-  Camera, 
-  MessageCircle, 
-  CheckCircle,
-  Upload,
-  Send,
-  Phone
-} from "lucide-react";
 
 const MissionExecution = () => {
   const navigate = useNavigate();
@@ -66,8 +57,13 @@ const MissionExecution = () => {
               onClick={() => navigate('/mobile/feed-opportunities')}
               className="hover:bg-slate-100"
             >
-              <ArrowLeft className="h-5 w-5 text-slate-600" />
+              <span>←</span>
             </Button>
+            <img 
+              src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
+              alt="Logo" 
+              className="h-6"
+            />
             <div>
               <h1 className="text-xl font-light text-slate-700">Executando Missão</h1>
               <p className="text-sm text-slate-500">Entrega de Documentos</p>
@@ -75,7 +71,7 @@ const MissionExecution = () => {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="icon" className="border-slate-200 hover:bg-slate-50">
-              <Phone className="h-5 w-5 text-slate-600" />
+              <span>📞</span>
             </Button>
             <Button 
               variant="outline" 
@@ -83,7 +79,7 @@ const MissionExecution = () => {
               onClick={() => setShowChat(!showChat)}
               className="border-slate-200 hover:bg-slate-50"
             >
-              <MessageCircle className="h-5 w-5 text-slate-600" />
+              <span>💬</span>
             </Button>
           </div>
         </div>
@@ -133,7 +129,7 @@ const MissionExecution = () => {
                   {item.required && <span className="text-blue-500 ml-1">*</span>}
                 </label>
                 {checklist[item.key as keyof typeof checklist] && (
-                  <CheckCircle className="h-5 w-5 text-blue-500" />
+                  <span className="text-blue-500">✅</span>
                 )}
               </div>
             ))}
@@ -144,24 +140,24 @@ const MissionExecution = () => {
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-medium text-slate-700">
-              <Camera className="h-5 w-5 text-blue-500" />
+              <span className="text-blue-500">📷</span>
               Evidências Fotográficas
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <Button variant="outline" className="w-full h-12 border-slate-200 hover:bg-slate-50">
-              <Camera className="h-5 w-5 mr-2 text-slate-600" />
+              <span className="mr-2">📷</span>
               Tirar Foto dos Documentos
             </Button>
             <Button variant="outline" className="w-full h-12 border-slate-200 hover:bg-slate-50">
-              <Camera className="h-5 w-5 mr-2 text-slate-600" />
+              <span className="mr-2">📷</span>
               Foto da Entrega
             </Button>
             {photos.length > 0 && (
               <div className="grid grid-cols-2 gap-2">
                 {photos.map((photo, index) => (
                   <div key={index} className="aspect-square bg-slate-100 rounded-lg flex items-center justify-center border border-slate-200">
-                    <Camera className="h-8 w-8 text-slate-400" />
+                    <span className="text-slate-400 text-2xl">📷</span>
                   </div>
                 ))}
               </div>
@@ -174,7 +170,7 @@ const MissionExecution = () => {
           <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-medium text-slate-700">
-                <MessageCircle className="h-5 w-5 text-blue-500" />
+                <span className="text-blue-500">💬</span>
                 Canal de Comunicação
               </CardTitle>
             </CardHeader>
@@ -193,7 +189,7 @@ const MissionExecution = () => {
                   rows={2}
                 />
                 <Button size="icon" className="bg-blue-500 hover:bg-blue-600">
-                  <Send className="h-4 w-4" />
+                  <span>📤</span>
                 </Button>
               </div>
             </CardContent>
@@ -210,7 +206,7 @@ const MissionExecution = () => {
               : 'bg-slate-300 cursor-not-allowed'
           }`}
         >
-          <CheckCircle className="h-6 w-6 mr-2" />
+          <span className="mr-2">✅</span>
           Finalizar e Enviar para Aprovação
         </Button>
 
