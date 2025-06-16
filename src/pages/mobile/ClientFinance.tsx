@@ -57,7 +57,7 @@ const ClientFinance = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100">Saldo Disponível</p>
+                  <p className="text-blue-100 px-[84px]">Saldo Disponível</p>
                   <h2 className="text-3xl font-light">R$ 850,00</h2>
                   <p className="text-blue-100">Para novas missões</p>
                 </div>
@@ -103,7 +103,7 @@ const ClientFinance = () => {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="font-light text-slate-700 text-lg">R$ 450,00</p>
+                <p className="text-2xl font-light text-slate-700">R$ 450,00</p>
                 <p className="text-sm text-slate-500">Total Gasto</p>
               </div>
               <div className="text-center p-4 bg-blue-50 rounded-lg">
@@ -137,7 +137,7 @@ const ClientFinance = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs">
+                  <p className={`font-medium ${transaction.type === 'credit' ? 'text-blue-600' : 'text-slate-600'}`}>
                     {transaction.type === 'credit' ? '+' : ''}R$ {Math.abs(transaction.amount).toFixed(2)}
                   </p>
                   <Badge variant={transaction.status === 'completed' ? 'default' : 'secondary'} className={transaction.status === 'completed' ? 'bg-blue-500' : 'bg-slate-200 text-slate-600'}>
