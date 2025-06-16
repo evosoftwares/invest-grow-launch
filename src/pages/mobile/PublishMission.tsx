@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +17,7 @@ const PublishMission = () => {
     estimatedTime: '',
     category: ''
   });
+  const [selectedTemplate, setSelectedTemplate] = useState('');
 
   const categories = [
     { id: 'delivery', name: 'Entrega' },
@@ -46,156 +46,217 @@ const PublishMission = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <div className="bg-white/90 backdrop-blur-sm shadow-sm p-4">
-        <div className="flex items-center gap-3">
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200">
+        <div className="flex items-center gap-3 px-4 py-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/mobile/client-dashboard')}
-            className="hover:bg-slate-100"
+            className="hover:bg-slate-100 rounded-full"
           >
-            ←
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
           </Button>
-          <h1 className="text-xl font-light text-slate-700">Nova Missão</h1>
+          <h1 className="text-xl font-semibold text-slate-800">Nova Missão</h1>
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
-        {/* Informações Básicas */}
-        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-slate-700">
-              Informações da Missão
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="title" className="text-slate-600">Título</Label>
-              <Input
-                id="title"
-                placeholder="Ex: Entrega de documento urgente"
-                value={formData.title}
-                onChange={(e) => setFormData({...formData, title: e.target.value})}
-                className="border-slate-200 focus:border-blue-300"
-              />
-            </div>
-            <div>
-              <Label htmlFor="description" className="text-slate-600">Descrição</Label>
-              <Textarea
-                id="description"
-                placeholder="Descreva detalhadamente o que precisa ser feito..."
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="border-slate-200 focus:border-blue-300 min-h-[100px]"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Localização e Valor */}
-        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-          <CardContent className="p-4 space-y-4">
-            <div>
-              <Label htmlFor="address" className="text-slate-600">
-                Endereço
-              </Label>
-              <Input
-                id="address"
-                placeholder="Rua, número, bairro, cidade"
-                value={formData.address}
-                onChange={(e) => setFormData({...formData, address: e.target.value})}
-                className="border-slate-200 focus:border-blue-300"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="value" className="text-slate-600">
-                  Valor (R$)
+      {/* Content */}
+      <div className="pb-24"> {/* Added bottom padding for floating button */}
+        <div className="px-4 py-6 space-y-6 max-w-2xl mx-auto">
+          {/* Informações Básicas */}
+          <Card className="border-slate-200 bg-white/95 backdrop-blur-sm shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                Informações da Missão
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="title" className="text-sm font-medium text-slate-700">
+                  Título da Missão
                 </Label>
                 <Input
-                  id="value"
-                  type="number"
-                  placeholder="0,00"
-                  value={formData.value}
-                  onChange={(e) => setFormData({...formData, value: e.target.value})}
-                  className="border-slate-200 focus:border-blue-300"
+                  id="title"
+                  placeholder="Ex: Entrega de documento urgente"
+                  value={formData.title}
+                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  className="border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 h-11"
                 />
               </div>
-              <div>
-                <Label htmlFor="time" className="text-slate-600">
-                  Tempo Est.
+              
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-sm font-medium text-slate-700">
+                  Descrição Detalhada
+                </Label>
+                <Textarea
+                  id="description"
+                  placeholder="Descreva detalhadamente o que precisa ser feito, incluindo requisitos específicos, materiais necessários, etc."
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  className="border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 min-h-[120px] resize-none"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Localização e Valor */}
+          <Card className="border-slate-200 bg-white/95 backdrop-blur-sm shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                Localização e Remuneração
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="address" className="text-sm font-medium text-slate-700">
+                  Endereço Completo
                 </Label>
                 <Input
-                  id="time"
-                  placeholder="Ex: 2h"
-                  value={formData.estimatedTime}
-                  onChange={(e) => setFormData({...formData, estimatedTime: e.target.value})}
-                  className="border-slate-200 focus:border-blue-300"
+                  id="address"
+                  placeholder="Rua, número, bairro, cidade, CEP"
+                  value={formData.address}
+                  onChange={(e) => setFormData({...formData, address: e.target.value})}
+                  className="border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 h-11"
                 />
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Categoria */}
-        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-slate-700">Categoria</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <Label htmlFor="category" className="text-slate-600">Selecione a categoria</Label>
-              <Select 
-                value={formData.category} 
-                onValueChange={(value) => setFormData({...formData, category: value})}
-              >
-                <SelectTrigger className="w-full border-slate-200 focus:border-blue-300 bg-white">
-                  <SelectValue placeholder="Escolha uma categoria" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-slate-200 z-50">
-                  {categories.map((category) => (
-                    <SelectItem 
-                      key={category.id} 
-                      value={category.id}
-                      className="hover:bg-blue-50 focus:bg-blue-50"
-                    >
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Templates de Checklist */}
-        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-slate-700">
-              Template de Checklist
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {checklistTemplates.map((template) => (
-              <div key={template.id} className="p-3 border border-slate-200 rounded-lg">
-                <h4 className="font-medium text-slate-700">{template.name}</h4>
-                <ul className="text-sm text-slate-500 mt-1">
-                  {template.items.map((item, index) => (
-                    <li key={index}>• {item}</li>
-                  ))}
-                </ul>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="value" className="text-sm font-medium text-slate-700">
+                    Valor (R$)
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 text-sm">
+                      R$
+                    </span>
+                    <Input
+                      id="value"
+                      type="number"
+                      placeholder="0,00"
+                      value={formData.value}
+                      onChange={(e) => setFormData({...formData, value: e.target.value})}
+                      className="border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 h-11 pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="time" className="text-sm font-medium text-slate-700">
+                    Tempo Estimado
+                  </Label>
+                  <Input
+                    id="time"
+                    placeholder="Ex: 2h, 30min"
+                    value={formData.estimatedTime}
+                    onChange={(e) => setFormData({...formData, estimatedTime: e.target.value})}
+                    className="border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 h-11"
+                  />
+                </div>
               </div>
-            ))}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Botão de Publicar */}
-        <Button
-          onClick={handleSubmit}
-          className="w-full h-14 bg-blue-500 hover:bg-blue-600 text-lg shadow-sm"
-        >
-          Publicar Missão
-        </Button>
+          {/* Categoria */}
+          <Card className="border-slate-200 bg-white/95 backdrop-blur-sm shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                Categoria
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="category" className="text-sm font-medium text-slate-700">
+                  Tipo de Serviço
+                </Label>
+                <Select 
+                  value={formData.category} 
+                  onValueChange={(value) => setFormData({...formData, category: value})}
+                >
+                  <SelectTrigger className="w-full border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 bg-white h-11">
+                    <SelectValue placeholder="Escolha uma categoria" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-slate-200 shadow-lg">
+                    {categories.map((category) => (
+                      <SelectItem 
+                        key={category.id} 
+                        value={category.id}
+                        className="hover:bg-blue-50 focus:bg-blue-50 cursor-pointer"
+                      >
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Templates de Checklist */}
+          <Card className="border-slate-200 bg-white/95 backdrop-blur-sm shadow-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                Template de Checklist
+              </CardTitle>
+              <p className="text-sm text-slate-600 mt-1">
+                Selecione um modelo para facilitar a verificação da missão
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {checklistTemplates.map((template) => (
+                <div 
+                  key={template.id} 
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                    selectedTemplate === template.id 
+                      ? 'border-blue-400 bg-blue-50' 
+                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                  }`}
+                  onClick={() => setSelectedTemplate(template.id)}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-slate-800">{template.name}</h4>
+                    <div className={`w-4 h-4 rounded-full border-2 ${
+                      selectedTemplate === template.id 
+                        ? 'border-blue-500 bg-blue-500' 
+                        : 'border-slate-300'
+                    }`}>
+                      {selectedTemplate === template.id && (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <ul className="text-sm text-slate-600 space-y-1">
+                    {template.items.map((item, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-blue-500 mt-1">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Floating Action Button */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white/95 to-transparent">
+        <div className="max-w-2xl mx-auto">
+          <Button
+            onClick={handleSubmit}
+            className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl"
+          >
+            Publicar Missão
+          </Button>
+        </div>
       </div>
     </div>
   );
