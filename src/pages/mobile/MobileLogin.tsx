@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Mail, Eye, EyeOff, Google, Apple } from 'lucide-react';
-import useAuth from '../../hooks/useAuth'; // Corrigido o caminho para importação relativa
+import { Mail, Eye, EyeOff, Chrome, Apple } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 // Rotas centralizadas
 const ROUTES = {
@@ -50,6 +50,11 @@ export default function MobileLogin() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-blue-50 p-4">
       <Card className="w-full max-w-md bg-white shadow-lg rounded-2xl">
         <CardHeader className="text-center py-6">
+          <img 
+            src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
+            alt="Logo" 
+            className="h-8 mx-auto mb-4"
+          />
           <h1 className="text-2xl font-light text-slate-800">Bem-vindo</h1>
           <p className="text-sm text-slate-500 mt-1">Faça login para continuar</p>
         </CardHeader>
@@ -107,7 +112,7 @@ export default function MobileLogin() {
 
           <div className="flex gap-3">
             <Button className={btnOutline}>
-              <Google size={20} />
+              <Chrome size={20} />
               <span>Google</span>
             </Button>
             <Button className={btnOutline}>
