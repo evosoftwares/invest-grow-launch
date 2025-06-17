@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,4 +79,87 @@ const PartnerProfile = () => {
       <div className="p-4 space-y-6">
         {/* Profile Summary */}
         <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-          <CardContent classNam
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xl font-semibold">JP</span>
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-white" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-semibold text-slate-800">João Pedro Silva</h2>
+                <p className="text-slate-600">Parceiro desde Março 2024</p>
+                <div className="flex items-center mt-2">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-current" />
+                    ))}
+                  </div>
+                  <span className="ml-2 text-sm text-slate-600">4.8 (127 avaliações)</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Services */}
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-slate-800">Serviços Oferecidos</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {Object.entries(services).map(([service, enabled]) => (
+              <div key={service} className="flex items-center justify-between">
+                <span className="text-slate-700 capitalize">{service}</span>
+                <Switch
+                  checked={enabled}
+                  onCheckedChange={(checked) => 
+                    setServices(prev => ({ ...prev, [service]: checked }))
+                  }
+                />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Documents */}
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-slate-800">Documentação</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {documents.map((doc, index) => (
+              <div key={index} className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  {getStatusIcon(doc.status)}
+                  <div>
+                    <p className="font-medium text-slate-800">{doc.name}</p>
+                    <p className="text-sm text-slate-600">{doc.message}</p>
+                  </div>
+                </div>
+                <Badge className={getStatusColor(doc.status)}>
+                  {getStatusText(doc.status)}
+                </Badge>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Upload Document */}
+        <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
+          <CardContent className="p-6">
+            <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">
+              <Upload className="w-4 h-4 mr-2" />
+              Enviar Documento
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default PartnerProfile;
