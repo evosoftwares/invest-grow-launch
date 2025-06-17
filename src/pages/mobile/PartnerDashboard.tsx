@@ -1,164 +1,199 @@
-
-import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { 
+  AlertCircle, 
+  RefreshCw, 
+  DollarSign, 
+  CheckCircle, 
+  Clock, 
+  Calendar,
+  TrendingUp,
+  Users,
+  AlertTriangle,
+  XCircle
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { usePartnerId } from "@/hooks/usePartnerId";
+import { usePartnerCommissions } from "@/hooks/usePartnerCommissions";
+import { usePartnerStats } from "@/hooks/usePartnerStats";
+import PartnerErrorBoundary from "@/components/partner/PartnerErrorBoundary";
+import PartnerDashboardHeader from "@/components/partner/PartnerDashboardHeader";
+import PartnerStatsCards from "@/components/partner/PartnerStatsCards";
+import PartnerQuickActions from "@/components/partner/PartnerQuickActions";
+import PartnerAccountStatus from "@/components/partner/PartnerAccountStatus";
 
-const PartnerDashboard = () => {
+const PartnerDashboardContent = () => {
   const navigate = useNavigate();
-  const [notifications] = useState(3);
+  const { signOut, userProfile } = useAuth();
+  const { data: partnerId, isLoading: isLoadingPartnerId, error: partnerError } = usePartnerId();
+  const { data: commissions = [], isLoading: isLoadingCommissions } = usePartnerCommissions();
+  const { data: partnerStats, isLoading } = usePartnerStats(partnerId);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <div className="bg-white/90 backdrop-blur-sm shadow-sm p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img 
-              src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
-              alt="Logo" 
-              className="h-8"
-            />
-            <div>
-              <h1 className="text-xl font-light text-slate-700">Dashboard</h1>
-              <p className="text-slate-500">Olá, João!</p>
-            </div>
-          </div>
-          <div className="relative">
-            <Button variant="ghost" size="icon" className="hover:bg-slate-100">
-              <span className="text-slate-600">🔔</span>
-              {notifications > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-blue-500">
-                  {notifications}
-                </Badge>
-              )}
+  // CORREÇÃO: Calcular comissões baseadas nos dados reais com validações rigorosas
+  const commissionStats = {
+    totalCommissions: commissions.reduce((sum, comm) => sum + Number(comm.amount), 0),
+    paidCommissions: commissions
+      .filter(comm => {
+        if (!comm.paid_at) return false;
+        const paidDate = new Date(comm.paid_at);
+        const now = new Date();
+        // Garantir que a data não é futura
+        return paidDate <= now;
+      })
+      .reduce((sum, comm) => sum + Number(comm.amount), 0),
+    pendingCommissions: commissions
+      .filter(comm => !comm.paid_at)
+      .reduce((sum, comm) => sum + Number(comm.amount), 0),
+    // CORREÇÃO: Comissões mensais baseadas APENAS em paid_at válido
+    monthlyCommissions: commissions
+      .filter(comm => {
+        if (!comm.paid_at) return false;
+        const paidDate = new Date(comm.paid_at);
+        const now = new Date();
+        // Verificar se é do mês atual e não é futuro
+        return paidDate <= now && 
+               paidDate.getMonth() === now.getMonth() && 
+               paidDate.getFullYear() === now.getFullYear();
+      })
+      .reduce((sum, comm) => sum + Number(comm.amount), 0)
+  };
+
+  // CORREÇÃO: Log detalhado das comissões para debugging
+  console.log('=== COMMISSION STATS DETAILED VALIDATION ===');
+  console.log('[COMMISSIONS] Total commissions found:', commissions.length);
+  console.log('[TOTAL] Total commission amount:', commissionStats.totalCommissions);
+  console.log('[PAID] Paid commissions amount:', commissionStats.paidCommissions);
+  console.log('[PENDING] Pending commissions amount:', commissionStats.pendingCommissions);
+  console.log('[MONTHLY] Monthly commissions (current month):', commissionStats.monthlyCommissions);
+  
+  // Validar se a soma está correta
+  const calculatedTotal = commissionStats.paidCommissions + commissionStats.pendingCommissions;
+  if (Math.abs(calculatedTotal - commissionStats.totalCommissions) > 0.01) {
+    console.error('[ERROR] COMMISSION CALCULATION ERROR: Total != Paid + Pending');
+    console.error('Total:', commissionStats.totalCommissions);
+    console.error('Paid + Pending:', calculatedTotal);
+    console.error('Difference:', Math.abs(calculatedTotal - commissionStats.totalCommissions));
+  } else {
+    console.log('[SUCCESS] Commission calculations are consistent');
+  }
+
+  // Validar comissões individualmente
+  commissions.forEach(comm => {
+    if (comm.paid_at) {
+      const paidDate = new Date(comm.paid_at);
+      const now = new Date();
+      if (paidDate > now) {
+        console.error(`[CRITICAL] Commission ${comm.id} still has future paid_at:`, comm.paid_at);
+      }
+    }
+    if (Number(comm.amount) <= 0) {
+      console.warn(`[WARNING] Commission ${comm.id} has zero or negative amount:`, comm.amount);
+    }
+  });
+
+  const stats = partnerStats ? {
+    ...partnerStats,
+    ...commissionStats
+  } : {
+    totalInvestors: 0,
+    activeInvestors: 0,
+    totalInvestments: 0,
+    approvedInvestments: 0,
+    conversionRate: 0,
+    totalCommissions: 0,
+    paidCommissions: 0,
+    pendingCommissions: 0,
+    monthlyCommissions: 0
+  };
+
+  // Log das estatísticas finais com validação
+  console.log('=== FINAL DASHBOARD STATS ===');
+  console.log('Final stats used in dashboard:', stats);
+  
+  // Validações finais
+  if (stats.activeInvestors > stats.totalInvestors) {
+    console.error('[CRITICAL] Active investors > Total investors!');
+  }
+  if (stats.conversionRate > 100) {
+    console.error('[CRITICAL] Conversion rate > 100%!');
+  }
+  if (stats.approvedInvestments < 0) {
+    console.error('[CRITICAL] Negative approved investments!');
+  }
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
+  };
+
+  if (isLoadingPartnerId || isLoading || isLoadingCommissions) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (partnerError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Erro de Configuração</h2>
+          <p className="text-gray-600 mb-4">
+            Não foi possível carregar seus dados de parceiro. 
+            Sua conta pode ainda estar sendo configurada.
+          </p>
+          <div className="space-y-2">
+            <Button onClick={() => window.location.reload()}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Tentar Novamente
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/')}>
+              Voltar ao Início
             </Button>
           </div>
         </div>
       </div>
+    );
+  }
 
-      <div className="p-4 space-y-6">
-        {/* Saldo em Carteira - Card de Destaque */}
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100">Saldo em Carteira</p>
-                <h2 className="text-3xl font-light">R$ 1.247,50</h2>
-                <p className="text-blue-100">+R$ 150,00 hoje</p>
-              </div>
-              <div className="text-blue-200 text-4xl">💰</div>
-            </div>
-            <Button 
-              onClick={() => navigate('/mobile/wallet')}
-              variant="secondary" 
-              className="w-full mt-4 bg-white/90 text-blue-600 hover:bg-white"
-            >
-              Ver Carteira
-            </Button>
-          </CardContent>
-        </Card>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <PartnerDashboardHeader 
+        userFullName={userProfile?.full_name}
+        onLogout={handleLogout}
+      />
 
-        {/* Card de Status Inteligente */}
-        <Card className="border-blue-200 bg-blue-50/50 backdrop-blur-sm">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-              <div>
-                <p className="font-medium text-blue-700">Status: Online</p>
-                <p className="text-sm text-blue-600">Você tem 5 oportunidades próximas</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Resumo do Dia */}
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-            <CardContent className="p-4 text-center">
-              <div className="text-blue-500 text-2xl mb-2">💵</div>
-              <p className="text-2xl font-light text-slate-700">R$ 150</p>
-              <p className="text-sm text-slate-500">Ganhos Hoje</p>
-            </CardContent>
-          </Card>
-          <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-            <CardContent className="p-4 text-center">
-              <div className="text-blue-500 text-2xl mb-2">🎯</div>
-              <p className="text-2xl font-light text-slate-700">3</p>
-              <p className="text-sm text-slate-500">Missões</p>
-            </CardContent>
-          </Card>
+      <div className="p-6">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Bem-vindo ao seu Dashboard
+          </h2>
+          <p className="text-gray-600">
+            Gerencie seus investidores cadastrados e acompanhe suas comissões.
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-            <CardContent className="p-4 text-center">
-              <div className="text-blue-400 text-2xl mb-2">⭐</div>
-              <p className="text-2xl font-light text-slate-700">4.8</p>
-              <p className="text-sm text-slate-500">Avaliação</p>
-            </CardContent>
-          </Card>
-          <Card className="border-slate-200 bg-white/90 backdrop-blur-sm shadow-sm">
-            <CardContent className="p-4 text-center">
-              <div className="text-blue-500 text-2xl mb-2">⏰</div>
-              <p className="text-2xl font-light text-slate-700">6h</p>
-              <p className="text-sm text-slate-500">Online</p>
-            </CardContent>
-          </Card>
-        </div>
+        <PartnerStatsCards stats={stats} />
 
-        {/* Atalhos Principais */}
-        <div className="space-y-3">
-          <Button
-            onClick={() => navigate('/mobile/feed-opportunities')}
-            className="w-full h-14 bg-blue-500 hover:bg-blue-600 flex items-center justify-between px-6 shadow-sm"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-xl">📍</span>
-              <div className="text-left">
-                <p className="font-medium">Feed de Oportunidades</p>
-                <p className="text-sm opacity-90">5 missões disponíveis</p>
-              </div>
-            </div>
-            <Badge className="bg-white text-blue-600">Nova</Badge>
-          </Button>
-
-          <Button
-            onClick={() => navigate('/mobile/rewards-club')}
-            variant="outline"
-            className="w-full h-14 flex items-center justify-between px-6 border-slate-200 hover:bg-slate-50"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-blue-500 text-xl">🏆</span>
-              <div className="text-left">
-                <p className="font-medium text-slate-700">Clube de Vantagens</p>
-                <p className="text-sm text-slate-500">Nível Bronze</p>
-              </div>
-            </div>
-            <span className="text-slate-400">📈</span>
-          </Button>
-        </div>
-
-        {/* Menu de Navegação Rápida */}
-        <div className="grid grid-cols-2 gap-3">
-          <Button 
-            variant="outline" 
-            className="h-12 border-slate-200 hover:bg-slate-50"
-            onClick={() => navigate('/mobile/partner-profile')}
-          >
-            Meu Perfil
-          </Button>
-          <Button 
-            variant="outline" 
-            className="h-12 border-slate-200 hover:bg-slate-50"
-            onClick={() => navigate('/mobile/mission-history')}
-          >
-            Histórico
-          </Button>
+        <div className="grid md:grid-cols-2 gap-6">
+          <PartnerQuickActions partnerId={partnerId} />
+          <PartnerAccountStatus partnerId={partnerId} stats={stats} />
         </div>
       </div>
     </div>
+  );
+};
+
+const PartnerDashboard = () => {
+  return (
+    <PartnerErrorBoundary>
+      <PartnerDashboardContent />
+    </PartnerErrorBoundary>
   );
 };
 
