@@ -100,7 +100,7 @@ const MobileLogin = () => {
               </Button>
               <Button variant="outline" className="w-full h-12 border-slate-200 hover:bg-slate-50">
                 <div className="w-5 h-5 mr-2 bg-black rounded-sm flex items-center justify-center">
-                  <span className="text-white text-xs">🍎</span>
+                  <span className="text-white text-xs">🖱️</span>
                 </div>
                 Apple
               </Button>
