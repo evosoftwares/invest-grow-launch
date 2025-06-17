@@ -1,7 +1,5 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
 interface PartnerAccountStatusProps {
   partnerId: string | null;
   stats: {
@@ -9,10 +7,11 @@ interface PartnerAccountStatusProps {
     monthlyCommissions: number;
   };
 }
-
-const PartnerAccountStatus = ({ partnerId, stats }: PartnerAccountStatusProps) => {
-  return (
-    <Card>
+const PartnerAccountStatus = ({
+  partnerId,
+  stats
+}: PartnerAccountStatusProps) => {
+  return <Card>
       <CardHeader>
         <CardTitle>Status da Conta</CardTitle>
         <CardDescription>
@@ -34,7 +33,7 @@ const PartnerAccountStatus = ({ partnerId, stats }: PartnerAccountStatusProps) =
         
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium">Comissão:</span>
-          <span className="text-sm font-bold">5% inicial / 2,5% recorrente</span>
+          <span className="text-sm font-bold text-right">5% inicial / 2,5% recorrente</span>
         </div>
         
         <div className="flex items-center justify-between">
@@ -49,8 +48,6 @@ const PartnerAccountStatus = ({ partnerId, stats }: PartnerAccountStatusProps) =
           </span>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
-
 export default PartnerAccountStatus;
