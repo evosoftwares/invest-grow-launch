@@ -1,6 +1,16 @@
-
 import { Button } from "@/components/ui/button";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { 
+  AlertCircle, 
+  RefreshCw, 
+  DollarSign, 
+  CheckCircle, 
+  Clock, 
+  Calendar,
+  TrendingUp,
+  Users,
+  AlertTriangle,
+  XCircle
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { usePartnerId } from "@/hooks/usePartnerId";
@@ -50,21 +60,21 @@ const PartnerDashboardContent = () => {
 
   // CORREÇÃO: Log detalhado das comissões para debugging
   console.log('=== COMMISSION STATS DETAILED VALIDATION ===');
-  console.log('💰 Total commissions found:', commissions.length);
-  console.log('💵 Total commission amount:', commissionStats.totalCommissions);
-  console.log('✅ Paid commissions amount:', commissionStats.paidCommissions);
-  console.log('⏳ Pending commissions amount:', commissionStats.pendingCommissions);
-  console.log('📅 Monthly commissions (current month):', commissionStats.monthlyCommissions);
+  console.log('[COMMISSIONS] Total commissions found:', commissions.length);
+  console.log('[TOTAL] Total commission amount:', commissionStats.totalCommissions);
+  console.log('[PAID] Paid commissions amount:', commissionStats.paidCommissions);
+  console.log('[PENDING] Pending commissions amount:', commissionStats.pendingCommissions);
+  console.log('[MONTHLY] Monthly commissions (current month):', commissionStats.monthlyCommissions);
   
   // Validar se a soma está correta
   const calculatedTotal = commissionStats.paidCommissions + commissionStats.pendingCommissions;
   if (Math.abs(calculatedTotal - commissionStats.totalCommissions) > 0.01) {
-    console.error('❌ COMMISSION CALCULATION ERROR: Total != Paid + Pending');
+    console.error('[ERROR] COMMISSION CALCULATION ERROR: Total != Paid + Pending');
     console.error('Total:', commissionStats.totalCommissions);
     console.error('Paid + Pending:', calculatedTotal);
     console.error('Difference:', Math.abs(calculatedTotal - commissionStats.totalCommissions));
   } else {
-    console.log('✅ Commission calculations are consistent');
+    console.log('[SUCCESS] Commission calculations are consistent');
   }
 
   // Validar comissões individualmente
@@ -73,11 +83,11 @@ const PartnerDashboardContent = () => {
       const paidDate = new Date(comm.paid_at);
       const now = new Date();
       if (paidDate > now) {
-        console.error(`❌ CRITICAL: Commission ${comm.id} still has future paid_at:`, comm.paid_at);
+        console.error(`[CRITICAL] Commission ${comm.id} still has future paid_at:`, comm.paid_at);
       }
     }
     if (Number(comm.amount) <= 0) {
-      console.warn(`⚠️ Commission ${comm.id} has zero or negative amount:`, comm.amount);
+      console.warn(`[WARNING] Commission ${comm.id} has zero or negative amount:`, comm.amount);
     }
   });
 
@@ -102,13 +112,13 @@ const PartnerDashboardContent = () => {
   
   // Validações finais
   if (stats.activeInvestors > stats.totalInvestors) {
-    console.error('❌ CRITICAL: Active investors > Total investors!');
+    console.error('[CRITICAL] Active investors > Total investors!');
   }
   if (stats.conversionRate > 100) {
-    console.error('❌ CRITICAL: Conversion rate > 100%!');
+    console.error('[CRITICAL] Conversion rate > 100%!');
   }
   if (stats.approvedInvestments < 0) {
-    console.error('❌ CRITICAL: Negative approved investments!');
+    console.error('[CRITICAL] Negative approved investments!');
   }
 
   const handleLogout = async () => {
