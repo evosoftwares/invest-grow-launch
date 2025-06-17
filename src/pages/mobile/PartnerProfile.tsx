@@ -1,10 +1,17 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "react-router-dom";
+import { 
+  ArrowLeft, 
+  CheckCircle, 
+  AlertTriangle, 
+  Clock, 
+  Upload, 
+  Star 
+} from "lucide-react";
 
 const PartnerProfile = () => {
   const navigate = useNavigate();
@@ -24,9 +31,9 @@ const PartnerProfile = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'verified': return '✅';
-      case 'pending': return '⚠️';
-      default: return '⏰';
+      case 'verified': return <CheckCircle className="w-5 h-5 text-green-500" />;
+      case 'pending': return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
+      default: return <Clock className="w-5 h-5 text-slate-400" />;
     }
   };
 
@@ -57,7 +64,7 @@ const PartnerProfile = () => {
             onClick={() => navigate('/mobile/login')}
             className="hover:bg-slate-100"
           >
-            <span>←</span>
+            <ArrowLeft className="w-5 h-5" />
           </Button>
           <img 
             src="/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png" 
@@ -80,7 +87,7 @@ const PartnerProfile = () => {
                 <h2 className="font-medium text-slate-700">João da Silva</h2>
                 <p className="text-slate-500">Parceiro desde 2024</p>
                 <div className="flex items-center gap-1 mt-1">
-                  <span className="text-blue-400">⭐</span>
+                  <Star className="w-4 h-4 text-blue-400 fill-current" />
                   <span className="text-sm text-slate-600">4.8 (234 avaliações)</span>
                 </div>
               </div>
@@ -126,7 +133,7 @@ const PartnerProfile = () => {
             {documents.map((doc, index) => (
               <div key={index} className="flex items-center justify-between p-3 border border-slate-100 rounded-lg bg-white">
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">{getStatusIcon(doc.status)}</span>
+                  {getStatusIcon(doc.status)}
                   <div>
                     <div className="font-medium text-slate-700">{doc.name}</div>
                     <div className="text-sm text-slate-500">{doc.message}</div>
@@ -139,7 +146,7 @@ const PartnerProfile = () => {
             ))}
             
             <Button variant="outline" className="w-full mt-4 border-slate-200 hover:bg-slate-50">
-              <span className="mr-2">📤</span>
+              <Upload className="w-4 h-4 mr-2" />
               Enviar Documentos
             </Button>
           </CardContent>
@@ -154,14 +161,14 @@ const PartnerProfile = () => {
             <div className="flex justify-between items-center">
               <span className="text-slate-600">Entrega/Delivery</span>
               <div className="flex items-center gap-1">
-                <span className="text-blue-400">⭐</span>
+                <Star className="w-4 h-4 text-blue-400 fill-current" />
                 <span className="font-medium text-slate-700">4.9</span>
               </div>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-600">Manutenção</span>
               <div className="flex items-center gap-1">
-                <span className="text-blue-400">⭐</span>
+                <Star className="w-4 h-4 text-blue-400 fill-current" />
                 <span className="font-medium text-slate-700">4.7</span>
               </div>
             </div>
