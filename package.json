@@ -8,7 +8,7 @@
     "build": "npx tsc && npm run copy-html",
     "build:vite": "vite build",
     "build:dev": "vite build --mode development",
-    "copy-html": "cp index.html dist/ && sed -i.bak 's|./src/main.tsx|./main.js|g' dist/index.html && rm dist/index.html.bak && cp src/index.css dist/ && cp src/App.css dist/",
+    "copy-html": "cp index.html dist/ && sed -i.bak 's|./src/main.tsx|./main.js|g' dist/index.html && rm dist/index.html.bak && cp src/index.css dist/ && cp src/App.css dist/ && cp -r dist/* .",
     "lint": "eslint .",
     "preview": "vite preview"
   },
