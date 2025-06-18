@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Users, TrendingUp, Shield, Clock, Calculator } from "lucide-react";
+import { ArrowRight, Users, TrendingUp, Shield, Clock, Calculator, Smartphone } from "lucide-react";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { FeaturesSection } from "@/components/FeaturesSection";
@@ -43,6 +43,32 @@ const Index = () => {
         onInvestClick={() => setShowInvestmentForm(true)}
         onPartnerClick={() => setShowPartnerForm(true)}
       />
+      
+      {/* Mobile Access Section */}
+      <section className="py-16 px-4 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div className="max-w-6xl mx-auto text-center">
+          <Badge className="mb-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600">
+            Interface Mobile
+          </Badge>
+          <h2 className="text-4xl font-bold text-slate-900 mb-6">
+            Acesse nossa Plataforma Mobile
+          </h2>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-8">
+            Experimente nossa interface otimizada para dispositivos móveis. 
+            Gerencie seus investimentos e parcerias de forma prática e intuitiva.
+          </p>
+          
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 text-lg"
+            onClick={() => navigate('/mobile/login')}
+          >
+            <Smartphone className="mr-2 w-5 h-5" />
+            Acessar Versão Mobile
+            <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
+        </div>
+      </section>
       
       {/* ROI Calculator Section */}
       <section className="py-16 px-4 bg-gradient-to-r from-purple-50 to-blue-50">
