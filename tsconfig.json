@@ -1,19 +1,23 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
   "compilerOptions": {
+    "target": "es6",              // Compila para uma versão de JS moderna que os navegadores entendem
+    "module": "es6",              // Usa o sistema de módulos padrão do JS
+    "outDir": "./dist",           // **Importante: Onde colocar os arquivos .js compilados**
+    "rootDir": "./src",           // **Importante: Onde estão seus arquivos .ts originais**
+    "strict": false,              // Menos restritivo para facilitar o build
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx",           // Para suporte ao React
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "allowImportingTsExtensions": false,  // Para evitar erro com .tsx
+    "noImplicitAny": false,
+    "strictNullChecks": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "noImplicitAny": false,
-    "noUnusedParameters": false,
-    "skipLibCheck": true,
-    "allowJs": true,
-    "noUnusedLocals": false,
-    "strictNullChecks": false
-  }
+    }
+  },
+  "include": ["src/**/*"]
 }

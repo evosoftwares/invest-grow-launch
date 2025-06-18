@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npx tsc && npm run copy-html",
+    "build:vite": "vite build",
     "build:dev": "vite build --mode development",
+    "copy-html": "cp index.html dist/ && sed -i.bak 's|./src/main.tsx|./main.js|g' dist/index.html && rm dist/index.html.bak && cp src/index.css dist/ && cp src/App.css dist/",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -77,7 +79,7 @@
     "lovable-tagger": "^1.1.7",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.11",
-    "typescript": "^5.5.3",
+    "typescript": "^5.8.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"
   }
