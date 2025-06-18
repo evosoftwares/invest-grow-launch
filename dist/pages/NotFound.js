@@ -1,9 +1,0 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { Button } from "@/components/ui/button";
-import { Home, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-const NotFound = () => {
-    const navigate = useNavigate();
-    return (_jsxs("div", { className: "min-h-screen bg-gradient-to-br from-slate-50 to-blue-50", children: [_jsx("header", { className: "bg-white/90 backdrop-blur-md border-b border-slate-200", children: _jsx("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8", children: _jsx("div", { className: "flex justify-between items-center py-4", children: _jsx("div", { className: "flex items-center", children: _jsx("img", { src: "/lovable-uploads/aa2570db-abbc-4ebd-8d58-1d58c9570128.png", alt: "Futuro PDV", className: "h-10 w-auto cursor-pointer", onClick: () => navigate('/') }) }) }) }) }), _jsx("div", { className: "flex items-center justify-center min-h-[calc(100vh-80px)]", children: _jsxs("div", { className: "text-center", children: [_jsxs("div", { className: "mb-8", children: [_jsx("h1", { className: "text-6xl font-bold text-slate-900 mb-4", children: "404" }), _jsx("h2", { className: "text-2xl font-semibold text-slate-700 mb-2", children: "P\u00E1gina n\u00E3o encontrada" }), _jsx("p", { className: "text-slate-600 max-w-md mx-auto", children: "A p\u00E1gina que voc\u00EA est\u00E1 procurando n\u00E3o existe ou foi movida." })] }), _jsxs("div", { className: "flex flex-col sm:flex-row gap-4 justify-center", children: [_jsxs(Button, { onClick: () => navigate('/'), className: "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white", children: [_jsx(Home, { className: "w-4 h-4 mr-2" }), "Ir para Home"] }), _jsxs(Button, { variant: "outline", onClick: () => navigate(-1), children: [_jsx(ArrowLeft, { className: "w-4 h-4 mr-2" }), "Voltar"] })] })] }) })] }));
-};
-export default NotFound;
