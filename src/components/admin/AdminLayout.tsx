@@ -2,7 +2,7 @@
 import { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from "@/hooks/use-auth";
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { 
   LayoutDashboard, 
@@ -11,7 +11,9 @@ import {
   DollarSign, 
   BarChart3, 
   LogOut,
-  Home
+  Home,
+  Gift,
+  Megaphone
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -26,6 +28,8 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
     { icon: Users, label: 'Investidores', path: '/admin/investors' },
     { icon: UserCheck, label: 'Parceiros', path: '/admin/partners' },
+    { icon: Gift, label: 'Programa de Indicações', path: '/admin/referrals' },
+    { icon: Megaphone, label: 'Comunicação em Massa', path: '/admin/mass-communication' },
     { icon: DollarSign, label: 'Financeiro', path: '/admin/financial' },
     { icon: BarChart3, label: 'Relatórios', path: '/admin/reports' },
   ];

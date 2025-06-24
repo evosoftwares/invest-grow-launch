@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Eye, ExternalLink, DollarSign } from "lucide-react";
+import { PlusCircle, Eye, ExternalLink, DollarSign, Gift } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface PartnerQuickActionsProps {
@@ -36,6 +36,15 @@ const PartnerQuickActions = ({ partnerId }: PartnerQuickActionsProps) => {
         >
           <Eye className="mr-2 h-4 w-4" />
           Ver Meus Investidores
+        </Button>
+        
+        <Button 
+          onClick={() => navigate('/mobile/referrals')}
+          className="w-full justify-start bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700"
+          variant="default"
+        >
+          <Gift className="mr-2 h-4 w-4" />
+          Programa de Indicações
         </Button>
         
         <Button 

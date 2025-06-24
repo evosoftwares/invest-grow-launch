@@ -12,7 +12,7 @@ import {
   XCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { usePartnerId } from "@/hooks/usePartnerId";
 import { usePartnerCommissions } from "@/hooks/usePartnerCommissions";
 import { usePartnerStats } from "@/hooks/usePartnerStats";
@@ -21,6 +21,7 @@ import PartnerDashboardHeader from "@/components/partner/PartnerDashboardHeader"
 import PartnerStatsCards from "@/components/partner/PartnerStatsCards";
 import PartnerQuickActions from "@/components/partner/PartnerQuickActions";
 import PartnerAccountStatus from "@/components/partner/PartnerAccountStatus";
+import { MobileReferralNotification } from "@/components/mobile/referrals/MobileReferralNotification";
 
 const PartnerDashboardContent = () => {
   const navigate = useNavigate();
@@ -163,6 +164,8 @@ const PartnerDashboardContent = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <MobileReferralNotification />
+      
       <PartnerDashboardHeader 
         userFullName={userProfile?.full_name}
         onLogout={handleLogout}

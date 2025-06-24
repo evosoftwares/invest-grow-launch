@@ -408,6 +408,10 @@ export type Database = {
           id: string
           phone: string | null
           role: Database["public"]["Enums"]["user_role"] | null
+          selfie_url: string | null
+          selfie_verified: boolean | null
+          verification_score: number | null
+          verification_date: string | null
           updated_at: string | null
         }
         Insert: {
@@ -418,6 +422,10 @@ export type Database = {
           id: string
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          selfie_url?: string | null
+          selfie_verified?: boolean | null
+          verification_score?: number | null
+          verification_date?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -428,6 +436,43 @@ export type Database = {
           id?: string
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          selfie_url?: string | null
+          selfie_verified?: boolean | null
+          verification_score?: number | null
+          verification_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      service_categories: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -459,6 +504,158 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
           value?: Json
+        }
+        Relationships: []
+      }
+      driver_referrals: {
+        Row: {
+          id: string
+          referrer_id: string
+          referred_id: string
+          referral_code: string
+          status: Database["public"]["Enums"]["referral_status"] | null
+          created_at: string | null
+          approved_at: string | null
+          bonus_paid_at: string | null
+          rides_completed: number | null
+          target_rides: number | null
+          bonus_amount: number | null
+          expires_at: string | null
+          notes: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          referrer_id: string
+          referred_id: string
+          referral_code: string
+          status?: Database["public"]["Enums"]["referral_status"] | null
+          created_at?: string | null
+          approved_at?: string | null
+          bonus_paid_at?: string | null
+          rides_completed?: number | null
+          target_rides?: number | null
+          bonus_amount?: number | null
+          expires_at?: string | null
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          referrer_id?: string
+          referred_id?: string
+          referral_code?: string
+          status?: Database["public"]["Enums"]["referral_status"] | null
+          created_at?: string | null
+          approved_at?: string | null
+          bonus_paid_at?: string | null
+          rides_completed?: number | null
+          target_rides?: number | null
+          bonus_amount?: number | null
+          expires_at?: string | null
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_bonuses: {
+        Row: {
+          id: string
+          referral_id: string
+          amount: number
+          bonus_type: Database["public"]["Enums"]["bonus_type"] | null
+          paid_at: string | null
+          payment_reference: string | null
+          notes: string | null
+          created_at: string | null
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          referral_id: string
+          amount: number
+          bonus_type?: Database["public"]["Enums"]["bonus_type"] | null
+          paid_at?: string | null
+          payment_reference?: string | null
+          notes?: string | null
+          created_at?: string | null
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          referral_id?: string
+          amount?: number
+          bonus_type?: Database["public"]["Enums"]["bonus_type"] | null
+          paid_at?: string | null
+          payment_reference?: string | null
+          notes?: string | null
+          created_at?: string | null
+          created_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_bonuses_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "driver_referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_programs: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          bonus_amount: number
+          target_rides: number
+          is_active: boolean | null
+          expires_at: string | null
+          created_at: string | null
+          created_by: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          bonus_amount: number
+          target_rides: number
+          is_active?: boolean | null
+          expires_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          bonus_amount?: number
+          target_rides?: number
+          is_active?: boolean | null
+          expires_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -504,6 +701,8 @@ export type Database = {
         | "direct"
       partner_status: "pending" | "active" | "inactive" | "blocked"
       user_role: "admin" | "partner" | "investor"
+      referral_status: "pending" | "active" | "completed" | "expired" | "cancelled"
+      bonus_type: "referral_bonus" | "milestone_bonus" | "completion_bonus"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -639,6 +838,8 @@ export const Constants = {
       lead_source: ["website", "partner", "referral", "social_media", "direct"],
       partner_status: ["pending", "active", "inactive", "blocked"],
       user_role: ["admin", "partner", "investor"],
+      referral_status: ["pending", "active", "completed", "expired", "cancelled"],
+      bonus_type: ["referral_bonus", "milestone_bonus", "completion_bonus"],
     },
   },
 } as const

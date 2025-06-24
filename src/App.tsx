@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
+import { AuthProvider } from "@/hooks/use-auth";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ROICalculatorPage from "./pages/ROICalculatorPage";
@@ -12,6 +12,7 @@ import HowItWorksPage from "./pages/HowItWorksPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import InvestorsManagement from "./pages/admin/InvestorsManagement";
 import PartnersManagement from "./pages/admin/PartnersManagement";
+import { DriverReferralManagement } from "./pages/admin/DriverReferralManagement";
 import FinancialManagement from "./pages/admin/FinancialManagement";
 import ReportsPage from "./pages/admin/ReportsPage";
 import PartnerDashboard from "./pages/partner/PartnerDashboard";
@@ -38,6 +39,13 @@ import TaskApproval from "./pages/mobile/TaskApproval";
 import ClientFinance from "./pages/mobile/ClientFinance";
 import RideRequest from "./pages/mobile/RideRequest";
 import RideProgress from "./pages/mobile/RideProgress";
+
+// Mobile Referral Pages
+import MobileReferrals from "./pages/mobile/MobileReferrals";
+import MobileReferralShare from "./pages/mobile/MobileReferralShare";
+import MobileReferralDetails from "./pages/mobile/MobileReferralDetails";
+import MobileReferralBonus from "./pages/mobile/MobileReferralBonus";
+import MobileReferralRules from "./pages/mobile/MobileReferralRules";
 
 // Create a stable query client instance
 const queryClient = new QueryClient({
@@ -81,6 +89,13 @@ const App = () => (
               <Route path="/mobile/ride-request" element={<RideRequest />} />
               <Route path="/mobile/ride-progress" element={<RideProgress />} />
               
+              {/* Mobile Referral Routes */}
+              <Route path="/mobile/referrals" element={<MobileReferrals />} />
+              <Route path="/mobile/referrals/share" element={<MobileReferralShare />} />
+              <Route path="/mobile/referrals/bonus" element={<MobileReferralBonus />} />
+              <Route path="/mobile/referrals/rules" element={<MobileReferralRules />} />
+              <Route path="/mobile/referrals/:id" element={<MobileReferralDetails />} />
+              
               {/* Admin Routes */}
               <Route 
                 path="/admin/dashboard" 
@@ -103,6 +118,14 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredRole="admin">
                     <PartnersManagement />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/referrals" 
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <DriverReferralManagement />
                   </ProtectedRoute>
                 } 
               />
